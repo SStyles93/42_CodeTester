@@ -2,18 +2,6 @@
 #include <stdlib.h>
 #include <limits.h>
 
-/*
-** BUGS in ft_itoa.c:
-**   1. 'size' is uninitialized (UB) — must be initialised to 0.
-**   2. 'while(num / 10 > 0)' only counts digits for positive numbers;
-**      for negatives (num < 0) num/10 is still negative, never > 0.
-**   3. 'str[size--] = num % 10' — missing '+ '0'' (ASCII offset).
-**   4. No null terminator written anywhere.
-**   5. Does not handle n == 0 (the while condition is immediately false,
-**      leaving size uninitialized and writing no digit).
-**   6. INT_MIN (-2147483648): abs() overflows since 2147483648 > INT_MAX.
-*/
-
 char	*ft_itoa(int n);
 
 void	test_ft_itoa(t_ctx *ctx)

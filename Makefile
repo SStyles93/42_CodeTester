@@ -10,10 +10,13 @@ endif
 NAME        = tester$(EXE)
 CC          = gcc
 CFLAGS      = -Wall -Wextra
-INCLUDES    = -I include -I $(LIBFT_DIR)
+INCLUDES    = -I include
 
-LIBFT_DIR   = ../Libft
-LIBFT_A     = $(LIBFT_DIR)/libft.a
+# ── auto-detect student project directories ──────────────────────────────────
+LIBFT_DIR   := $(or $(wildcard ../libft),$(wildcard ../Libft),$(wildcard ../LIBFT))
+PRINTF_DIR  := $(or $(wildcard ../printf),$(wildcard ../Printf),$(wildcard ../PRINTF))
+
+$(info Detected:$(if $(LIBFT_DIR), libft ($(LIBFT_DIR)))$(if $(PRINTF_DIR), printf ($(PRINTF_DIR))))
 
 # ── tester sources ──────────────────────────────────────────────────────────
 SRCS        = src/main.c \
@@ -21,73 +24,78 @@ SRCS        = src/main.c \
               src/runner.c \
               src/utils.c \
               src/memcheck.c \
-              tests/libft/registry.c \
-              tests/libft/test_isalpha.c \
-              tests/libft/test_isdigit.c \
-              tests/libft/test_isalnum.c \
-              tests/libft/test_isascii.c \
-              tests/libft/test_isprint.c \
-              tests/libft/test_toupper.c \
-              tests/libft/test_tolower.c \
-              tests/libft/test_strlen.c \
-              tests/libft/test_memset.c \
-              tests/libft/test_bzero.c \
-              tests/libft/test_memcpy.c \
-              tests/libft/test_memmove.c \
-              tests/libft/test_memchr.c \
-              tests/libft/test_memcmp.c \
-              tests/libft/test_strchr.c \
-              tests/libft/test_strrchr.c \
-              tests/libft/test_strnstr.c \
-              tests/libft/test_strncmp.c \
-              tests/libft/test_strlcat.c \
-              tests/libft/test_strlcpy.c \
-              tests/libft/test_atoi.c \
-              tests/libft/test_calloc.c \
-              tests/libft/test_strdup.c \
-              tests/libft/test_substr.c \
-              tests/libft/test_strjoin.c \
-              tests/libft/test_strtrim.c \
-              tests/libft/test_split.c \
-              tests/libft/test_itoa.c \
-              tests/libft/test_strmapi.c \
-              tests/libft/test_striteri.c \
-              tests/libft/test_putchar_fd.c \
-              tests/libft/test_putstr_fd.c \
-              tests/libft/test_putendl_fd.c \
-              tests/libft/test_putnbr_fd.c \
-              tests/libft/test_lstnew.c \
-              tests/libft/test_lstadd_front.c \
-              tests/libft/test_lstadd_back.c \
-              tests/libft/test_lstsize.c \
-              tests/libft/test_lstlast.c \
-              tests/libft/test_lstdelone.c \
-              tests/libft/test_lstclear.c \
-              tests/libft/test_lstiter.c \
-              tests/libft/test_lstmap.c \
-              tests/libft/test_memory.c
+              tests/registry.c
 
-# ── bonus Libft sources ─────
-# Flags: -std=gnu89 silences the missing-return-type error in ft_strtrim.c;
-#        -w suppresses all other warnings from buggy student code;
-#        -Dft_strdup=strdup fixes the mismatch between ft_strmapi.c calling
-#        ft_strdup() and ft_strdup.c actually defining strdup().
-BONUS_DIR   = $(LIBFT_DIR)
-BONUS_FLAGS = -std=gnu89 -w -I $(LIBFT_DIR) -Dft_strdup=strdup
-BONUS_SRCS  = $(BONUS_DIR)/ft_strdup.c \
-              $(BONUS_DIR)/ft_substr.c \
-              $(BONUS_DIR)/ft_strjoin.c \
-              $(BONUS_DIR)/ft_strtrim.c \
-              $(BONUS_DIR)/ft_split.c \
-              $(BONUS_DIR)/ft_itoa.c \
-              $(BONUS_DIR)/ft_strmapi.c \
-              $(BONUS_DIR)/ft_striteri.c \
-              $(BONUS_DIR)/ft_putchar_fd.c \
-              $(BONUS_DIR)/ft_putstr_fd.c \
-              $(BONUS_DIR)/ft_putendl_fd.c \
-              $(BONUS_DIR)/ft_putnbr_fd.c
+ifneq ($(LIBFT_DIR),)
+    LIBFT_A  = $(LIBFT_DIR)/libft.a
+    CFLAGS   += -DWITH_LIBFT
+    INCLUDES += -I $(LIBFT_DIR)
+    LINK_LIBS = $(LIBFT_A)
+    LINK_DEPS = $(LIBFT_A)
+    LIBFT_FCLEAN = @$(MAKE) --no-print-directory -C $(LIBFT_DIR) fclean
+    SRCS     += tests/libft/registry.c \
+                tests/libft/test_isalpha.c \
+                tests/libft/test_isdigit.c \
+                tests/libft/test_isalnum.c \
+                tests/libft/test_isascii.c \
+                tests/libft/test_isprint.c \
+                tests/libft/test_toupper.c \
+                tests/libft/test_tolower.c \
+                tests/libft/test_strlen.c \
+                tests/libft/test_memset.c \
+                tests/libft/test_bzero.c \
+                tests/libft/test_memcpy.c \
+                tests/libft/test_memmove.c \
+                tests/libft/test_memchr.c \
+                tests/libft/test_memcmp.c \
+                tests/libft/test_strchr.c \
+                tests/libft/test_strrchr.c \
+                tests/libft/test_strnstr.c \
+                tests/libft/test_strncmp.c \
+                tests/libft/test_strlcat.c \
+                tests/libft/test_strlcpy.c \
+                tests/libft/test_atoi.c \
+                tests/libft/test_calloc.c \
+                tests/libft/test_strdup.c \
+                tests/libft/test_substr.c \
+                tests/libft/test_strjoin.c \
+                tests/libft/test_strtrim.c \
+                tests/libft/test_split.c \
+                tests/libft/test_itoa.c \
+                tests/libft/test_strmapi.c \
+                tests/libft/test_striteri.c \
+                tests/libft/test_putchar_fd.c \
+                tests/libft/test_putstr_fd.c \
+                tests/libft/test_putendl_fd.c \
+                tests/libft/test_putnbr_fd.c \
+                tests/libft/test_lstnew.c \
+                tests/libft/test_lstadd_front.c \
+                tests/libft/test_lstadd_back.c \
+                tests/libft/test_lstsize.c \
+                tests/libft/test_lstlast.c \
+                tests/libft/test_lstdelone.c \
+                tests/libft/test_lstclear.c \
+                tests/libft/test_lstiter.c \
+                tests/libft/test_lstmap.c \
+                tests/libft/test_memory.c
+else
+    LINK_LIBS    =
+    LINK_DEPS    =
+    LIBFT_FCLEAN = @true
+endif
 
-BONUS_OBJS  = $(BONUS_SRCS:$(BONUS_DIR)/%.c=tests/libft/bonus_%.o)
+ifneq ($(PRINTF_DIR),)
+    PRINTF_A     = $(PRINTF_DIR)/libftprintf.a
+    CFLAGS       += -DWITH_PRINTF
+    INCLUDES     += -I $(PRINTF_DIR)
+    LINK_LIBS    += $(PRINTF_A)
+    LINK_DEPS    += $(PRINTF_A)
+    PRINTF_FCLEAN = @$(MAKE) --no-print-directory -C $(PRINTF_DIR) fclean
+    SRCS         += tests/printf/registry.c \
+                    tests/printf/test_xyz.c
+else
+    PRINTF_FCLEAN = @true
+endif
 
 OBJS        = $(SRCS:.c=.o)
 
@@ -106,7 +114,6 @@ endif
 ifeq ($(SANITIZE),1)
     SANFLAGS    = -fsanitize=address,undefined -fno-omit-frame-pointer -g
     CFLAGS      += $(SANFLAGS)
-    BONUS_FLAGS += $(SANFLAGS)
     LFLAGS      += $(SANFLAGS)
     LIBFT_FLAGS = CFLAGS="-Wall -Wextra -Werror -c $(SANFLAGS)"
     MODE        = asan
@@ -121,18 +128,26 @@ VALGRIND    = valgrind -q --leak-check=full \
 # ── rules ────────────────────────────────────────────────────────────────────
 all: $(NAME)
 
-$(NAME): $(MODE_STAMP) $(LIBFT_A) $(OBJS) $(BONUS_OBJS)
-	$(CC) $(OBJS) $(BONUS_OBJS) $(LIBFT_A) $(LFLAGS) -o $(NAME)
+$(NAME): $(MODE_STAMP) $(LINK_DEPS) $(OBJS)
+	$(CC) $(OBJS) $(LINK_LIBS) $(LFLAGS) -o $(NAME)
 	@echo "Build complete. Run with: ./tester"
 
+ifneq ($(LIBFT_DIR),)
 # Always ask libft's Makefile, so edits to libft sources are picked up.
 $(LIBFT_A): FORCE
 	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) all $(LIBFT_FLAGS)
+endif
+
+ifneq ($(PRINTF_DIR),)
+$(PRINTF_A): FORCE
+	@$(MAKE) --no-print-directory -C $(PRINTF_DIR) all
+endif
 
 $(MODE_STAMP):
 	@rm -f .build_mode_*
-	@$(MAKE) --no-print-directory -C $(LIBFT_DIR) fclean
-	@rm -f $(OBJS) $(BONUS_OBJS) $(NAME)
+	$(LIBFT_FCLEAN)
+	$(PRINTF_FCLEAN)
+	@rm -f $(OBJS) $(NAME)
 	@touch $@
 
 asan:
@@ -148,15 +163,13 @@ valgrind:
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-# Bonus files get a separate, more permissive compile rule
-tests/libft/bonus_%.o: $(BONUS_DIR)/%.c
-	$(CC) $(BONUS_FLAGS) -c $< -o $@
-
 clean:
-	rm -f $(OBJS) $(BONUS_OBJS)
+	rm -f $(OBJS)
 
 fclean: clean
 	rm -f $(NAME) .build_mode_*
+	$(LIBFT_FCLEAN)
+	$(PRINTF_FCLEAN)
 
 re: fclean all
 

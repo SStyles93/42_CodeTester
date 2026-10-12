@@ -1,12 +1,6 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 
-/*
-** NOTE: ft_atoi.c has a bug — 'str++' after the sign check always increments,
-** skipping the first digit when there is no leading sign.
-** e.g. ft_atoi("42") returns 2 instead of 42.
-*/
-
 int	ft_atoi(const char *nptr);
 
 void	test_ft_atoi(t_ctx *ctx)

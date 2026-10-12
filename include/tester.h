@@ -69,6 +69,6 @@ void	run_suite_by_name(t_project *project, const char *name, int verbose);
 void	launch_menu(t_project **projects, int count);
 
 /* Project registries */
-t_project	*get_libft_project(void);
+t_project	**get_all_projects(int *count);
 
 #endif

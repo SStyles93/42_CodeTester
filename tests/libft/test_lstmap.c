@@ -30,11 +30,6 @@ static void	*map_identity(void *content)
 	return (content);
 }
 
-/*
-** Known bug in ft_lstmap: when ft_lstnew fails mid-loop, the cleanup
-** block does `new_node = new_node->next` while new_node is NULL.
-** This crashes; the malloc-fail path is not tested here for that reason.
-*/
 
 void	test_ft_lstmap(t_ctx *ctx)
 {

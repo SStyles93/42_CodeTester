@@ -1,17 +1,6 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 
-/*
-** BUGS in ft_strtrim.c:
-**   1. ft_char_in_set: missing return type 'int' (implicit int, C89 only).
-**   2. ft_char_in_set: increments *set before comparing — skips the FIRST
-**      character of the set entirely, so single-char sets never match.
-**   3. Trim-end loop: 'end = ft_strlen(s1)' → s1[end] == '\0', so the while
-**      never executes; trailing chars are never trimmed.
-**   4. Copies while 'start < end' (strict): the char at position 'end' is
-**      excluded — off-by-one for the last kept character.
-*/
-
 char	*ft_strtrim(char const *s1, char const *set);
 
 void	test_ft_strtrim(t_ctx *ctx)

@@ -2,13 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
-** BUGS in ft_strjoin.c:
-**   1. Calls ft_strlen() but the prototype is not visible — needs
-**      #include "libft.h" (or <string.h> with strlen).
-**   2. Missing #include <stdlib.h> for malloc.
-*/
-
 char	*ft_strjoin(char const *s1, char const *s2);
 
 void	test_ft_strjoin(t_ctx *ctx)

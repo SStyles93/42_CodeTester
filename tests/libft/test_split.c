@@ -2,17 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
-** BUGS in ft_split.c:
-**   1. count_words: 'is_separator(str, c)' passes the pointer 'str' (not
-**      'str[index]') — comparing a pointer to a char is always non-zero,
-**      so the inner while never terminates → infinite loop in count_words.
-**   2. malloc size: 'sizeof(char *) * count_words(...) + 1' — operator
-**      precedence means '+1' is added to the malloc result, not the element
-**      count. Should be 'sizeof(char *) * (count_words(...) + 1)'.
-**   3. Signature: 'char **ft_split(char *str, char c)' — should be
-**      'char **ft_split(char const *s, char c)' per the norm.
-*/
 
 char	**ft_split(char const *s, char c);
 

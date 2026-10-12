@@ -1,13 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
 
-/*
-** NOTES on ft_putendl_fd.c:
-**   - Inherits the first-char-skip bug from ft_putstr_fd (see test_putstr_fd).
-**   - '#include <libft.h>' needs the Libft directory on the include path.
-**   - The '\n' appended by ft_putchar_fd is correct.
-*/
-
 void	ft_putendl_fd(char *s, int fd);
 
 static void	t_putendl(t_ctx *ctx, const char *label, const char *s,

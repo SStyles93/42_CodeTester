@@ -16,7 +16,7 @@ static void	win_init_console(void)
 
 int	main(int argc, char **argv)
 {
-	t_project	*projects[4];
+	t_project	**projects;
 	int			project_count;
 	int			verbose;
 	int			i;
@@ -24,8 +24,7 @@ int	main(int argc, char **argv)
 #ifdef _WIN32
 	win_init_console();
 #endif
-	projects[0] = get_libft_project();
-	project_count = 1;
+	projects = get_all_projects(&project_count);
 	verbose = 0;
 	i = 1;
 	while (i < argc && argv[i][0] == '-')

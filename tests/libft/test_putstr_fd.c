@@ -1,15 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
 
-/*
-** BUGS in ft_putstr_fd.c:
-**   1. 'while(*s++)' increments s BEFORE writing — ft_putchar_fd receives
-**      s[1] on the first iteration, so the first character is always skipped.
-**      Fix: use '*s' then 's++' separately, or a classic indexed loop.
-**   2. '#include <libft.h>' uses angle brackets — needs '"libft.h"' or
-**      the Libft directory on the include path.
-*/
-
 void	ft_putstr_fd(char *s, int fd);
 
 static void	t_putstr(t_ctx *ctx, const char *label, const char *s,
@@ -34,7 +25,6 @@ static void	t_putstr(t_ctx *ctx, const char *label, const char *s,
 
 void	test_ft_putstr_fd(t_ctx *ctx)
 {
-	/* basic string — BUG: first char is skipped, so "hello" → "ello" */
 	t_putstr(ctx, "putstr_fd \"hello\"", "hello", "hello");
 
 	/* single char */

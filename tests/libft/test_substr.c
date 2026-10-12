@@ -1,17 +1,6 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 
-/*
-** BUGS in ft_substr.c:
-**   1. Off-by-one: 'while(s[start++] && len--)' increments start in the
-**      condition, then 'body uses s[start]' (already moved) — skips the char
-**      at the original start position.
-**   2. Returns the moved pointer 'new_str' instead of the beginning of the
-**      allocation, so the caller cannot free() the result.
-**   3. When start >= strlen(s), s[start] is accessed out-of-bounds (UB).
-**   4. Missing #include <stdlib.h> for malloc.
-*/
-
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 
 void	test_ft_substr(t_ctx *ctx)

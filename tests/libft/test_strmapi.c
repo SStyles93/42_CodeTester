@@ -1,13 +1,6 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 
-/*
-** BUGS in ft_strmapi.c:
-**   1. Calls ft_strdup() but libft.h only declares strdup() — rename
-**      the call to strdup() to match the (buggy) ft_strdup.c symbol.
-**      Fix ft_strdup.c to be named ft_strdup and update libft.h.
-*/
-
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 
 static char	to_upper(unsigned int i, char c)

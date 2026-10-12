@@ -1,17 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
 
-/*
-** BUGS in ft_striteri.c:
-**   1. 'while (s[i++])' — increments i in the condition; the body then uses
-**      the already-incremented i. This skips s[0] entirely and passes wrong
-**      (off-by-one) indices: f(1,&s[1]), f(2,&s[2]), … instead of
-**      f(0,&s[0]), f(1,&s[1]), …
-**   2. Check: '!s || !(*s) || !f' — '!(*s)' returns early on any empty
-**      string, which is correct, but is redundant since the while would
-**      simply not execute on an empty string.
-*/
-
 void	ft_striteri(char *s, void (*f)(unsigned int, char *));
 
 /* ---- helper state ---- */
