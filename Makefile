@@ -33,6 +33,8 @@ ifneq ($(LIBFT_DIR),)
     LINK_LIBS = $(LIBFT_A)
     LINK_DEPS = $(LIBFT_A)
     LIBFT_FCLEAN = @$(MAKE) --no-print-directory -C $(LIBFT_DIR) fclean
+
+    # TEST TO ADD HERE IF NECESSARY
     SRCS     += tests/libft/registry.c \
                 tests/libft/test_isalpha.c \
                 tests/libft/test_isdigit.c \
@@ -91,6 +93,8 @@ ifneq ($(PRINTF_DIR),)
     LINK_LIBS    += $(PRINTF_A)
     LINK_DEPS    += $(PRINTF_A)
     PRINTF_FCLEAN = @$(MAKE) --no-print-directory -C $(PRINTF_DIR) fclean
+    
+    # TEST TO ADD HERE IF NECESSARY
     SRCS         += tests/printf/registry.c \
                     tests/printf/test_ft_printf.c
 else
