@@ -1,8 +1,8 @@
-*This repository has been created as part of the 42 curriculum by sstyles.*
+*This repository has been created to test the 42 School projects.*
 
 # CodeTester
 
-An interactive C test harness for 42 projects.  
+An interactive C tester for 42 projects.  
 
 ## Coverage
 | **Library** | **State** | **Grade** |
