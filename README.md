@@ -16,9 +16,9 @@ An interactive C tester for 42 projects.
 - **Interactive menu** — browse and run suites from a TUI when launched with no arguments
 - **Crash isolation** — each suite runs in a forked child process; a segfault or infinite loop only kills that suite, not the whole run
 - **Timeout detection** — tests that hang are killed after a configurable deadline (default 10 s)
-- **Malloc-failure testing** — `memcheck` wraps `malloc`/`calloc`/`free` to inject allocation failures and verify your code handles them gracefully (Linux only)
-- **AddressSanitizer + UBSan** — `make asan` recompiles everything with sanitizers and runs the full suite
-- **Valgrind** — `make valgrind` runs under Valgrind with full leak checking (Linux only)
+- **Malloc-failure testing** — `memcheck` wraps `malloc`/`calloc`/`free` to inject allocation failures and verify your code handles them gracefully ${\color{orange}\text{(Linux only)}}$
+- **AddressSanitizer + UBSan** — `make asan` recompiles everything with sanitizers and runs the full suite ${\color{orange}\text{(Linux and macOS)}}$
+- **Valgrind** — `make valgrind` runs under Valgrind with full leak checking ${\color{orange}\text{(Linux only)}}$
 - **Cross-platform** — builds on Linux, macOS, and Windows (native or WSL/MinGW)
 - **Auto-detection** — the Makefile finds sibling project directories automatically (case-insensitive: `libft`, `Libft`, `LIBFT`, etc.) and only compiles the suites for projects that are present
 
@@ -28,11 +28,60 @@ An interactive C tester for 42 projects.
 |---|---|
 | `gcc` / `cc` | C compiler |
 | `make` | Build system |
-| Unix-like environment | Linux or macOS natively; Windows via WSL or MinGW/Git Bash |
-| `valgrind` | Optional — Linux only, for `make valgrind` |
-| ASan-capable compiler | Optional — for `make asan` |
+| Unix-like environment | ${\color{lightgreen}\text{Linux / macOS}}$ natively — ${\color{orange}\text{Windows}}$ via WSL or MinGW/Git Bash |
+| `valgrind` | Optional — ${\color{orange}\text{Linux only}}$, for `make valgrind` |
+| ASan-capable compiler | Optional — ${\color{orange}\text{Linux and macOS}}$, for `make asan` |
 
 The tester auto-detects your project directories as siblings of this repo (e.g. `../libft`). It builds the relevant library (e.g. `libft.a`) automatically before linking.
+
+## Building
+
+Your project directory must be a **sibling** of `CodeTester` — the Makefile finds it automatically:
+
+```
+parent/
+├── CodeTester/
+└── libft/          ← auto-detected
+```
+
+### ${\color{lightgreen}\text{macOS}}$ — fully supported
+
+Install Xcode Command Line Tools once, then build:
+
+```sh
+xcode-select --install   # one-time setup
+make
+./tester
+```
+
+`make asan` works. `make valgrind` is ${\color{red}\text{not available}}$ on macOS.
+
+### ${\color{orange}\text{Windows}}$
+
+**Option 1 — WSL** ${\color{lightgreen}\text{(recommended — full feature parity)}}$
+
+Install WSL2 with Ubuntu, then build exactly like Linux:
+
+```sh
+wsl
+make
+./tester
+```
+
+All features work: `make valgrind`, `make asan`, and malloc-failure injection.
+
+**Option 2 — MinGW / Git Bash** ${\color{orange}\text{(limited)}}$
+
+Install [MinGW-w64](https://www.mingw-w64.org/) or [MSYS2](https://www.msys2.org/), then from Git Bash:
+
+```sh
+make
+./tester.exe
+```
+
+The Makefile detects Windows and produces `tester.exe`. ${\color{red}\text{make valgrind}}$, ${\color{red}\text{make asan}}$, and ${\color{red}\text{malloc-failure tests}}$ are not available in this mode.
+
+---
 
 ## Usage
 
