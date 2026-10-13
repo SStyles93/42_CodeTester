@@ -1,10 +1,9 @@
 #include "../../include/tester.h"
 
-void	test_ft_xyz(t_ctx *ctx);
-
+void	test_ft_printf(t_ctx *ctx);
 
 static t_suite	g_suites[] = {
-	{"ft_xyz",      test_ft_xyz},
+	{"ft_printf",      test_ft_printf},
 };
 
 static t_project	g_project = {

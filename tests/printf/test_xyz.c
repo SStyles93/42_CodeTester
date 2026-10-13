@@ -1,9 +1,9 @@
 #include "../../include/tester.h"
-#include <stdlib.h>
+#include <stdio.h>
 
-int	ft_xyz(const char *nptr);
+int	test_ft_printf(const char *nptr);
 
-void	test_ft_xyz(t_ctx *ctx)
+void	test_ft_printf(t_ctx *ctx)
 {
-	//check_int(ctx, "\"42\"", atoi("42"), ft_atoi("42"));
+	check_int(ctx, "\"42\"", printf("%c", 'c'), ft_printf("%c", 'c'));
 }
