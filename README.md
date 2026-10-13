@@ -1,11 +1,3 @@
-<!-- Term:
-    GREEN: #00ff00
-    YELLOW: #ffff00
-    ORANGE: #ff5f15
-    RED: #ff0000 
--->
-
-
 *This repository has been created as part of the 42 curriculum by sstyles.*
 
 # CodeTester
@@ -15,8 +7,8 @@ An interactive C test harness for 42 projects.
 ## Coverage
 | **Library** | **State** | **Grade** |
 |---|---|---|
-| **Libft** | Full <span style="color:YELLOW;">(including linked-list functions)</span> | <span style="color:GREEN;">**100/100**</span> |  
-**Printf** | <span style="color:ORANGE;">In progress</span> | N |
+| **Libft** | Full ${\color{lightgreen}\text{(including linked-list functions)}}$ | ${\color{lightgreen}\text{100/100}}$ |  
+**Printf** | ${\color{orange}\text{In progress}}$ | ${\color{red}\text{N}}$ |
 
 
 ## Features
