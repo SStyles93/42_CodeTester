@@ -92,7 +92,7 @@ ifneq ($(PRINTF_DIR),)
     LINK_DEPS    += $(PRINTF_A)
     PRINTF_FCLEAN = @$(MAKE) --no-print-directory -C $(PRINTF_DIR) fclean
     SRCS         += tests/printf/registry.c \
-                    tests/printf/test_xyz.c
+                    tests/printf/test_ft_printf.c
 else
     PRINTF_FCLEAN = @true
 endif
