@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-void	*ft_memcpy(void *dest, const void *src, size_t n);
+#include "../../include/weak_functions.h"
 
 void	test_ft_memcpy(t_ctx *ctx)
 {

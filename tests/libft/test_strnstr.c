@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-char	*ft_strnstr(const char *big, const char *little, size_t len);
+#include "../../include/weak_functions.h"
 
 /* BSD strnstr is not always in standard headers; provide a reference impl */
 static char	*ref_strnstr(const char *big, const char *little, size_t len)

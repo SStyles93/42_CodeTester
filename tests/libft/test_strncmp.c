@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-int	ft_strncmp(char *s1, char *s2, size_t n);
+#include "../../include/weak_functions.h"
 
 static void	t_strncmp(t_ctx *ctx, const char *label,
 	const char *s1, const char *s2, size_t n)

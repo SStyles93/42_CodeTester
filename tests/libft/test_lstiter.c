@@ -1,9 +1,6 @@
 #include "../../include/tester.h"
-#include "libft.h"
 #include <stdlib.h>
-
-t_list	*ft_lstnew(void *content);
-void	ft_lstiter(t_list *lst, void (*f)(void *));
+#include "../../include/weak_functions.h"
 
 static int			g_iter_count;
 static uintptr_t	g_iter_vals[16];

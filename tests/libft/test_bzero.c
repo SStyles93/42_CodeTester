@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-void	ft_bzero(void *s, size_t n);
+#include "../../include/weak_functions.h"
 
 void	test_ft_bzero(t_ctx *ctx)
 {

@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-size_t	ft_strlen(const char *s);
+#include "../../include/weak_functions.h"
 
 void	test_ft_strlen(t_ctx *ctx)
 {

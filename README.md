@@ -124,7 +124,8 @@ CodeTester/
 │   ├── utils.c         # check_* assertion helpers
 │   └── memcheck.c      # malloc/calloc/free wrapper for failure injection
 ├── include/
-│   └── tester.h        # Shared types and declarations
+│   ├── tester.h        # Shared types and declarations
+│   └── weak_functions.h  # Weak declarations for all project functions
 ├── tests/
 │   ├── registry.c      # Aggregates all project registries (top-level)
 │   ├── libft/
@@ -177,11 +178,11 @@ This takes three steps, shown here for adding `ft_foo` to the Libft project:
 
 **1. Create `tests/libft/test_foo.c`**
 
+Include `weak_functions.h` instead of forward-declaring the function — the weak header centralises all declarations and enables missing-function detection:
+
 ```c
 #include "../../include/tester.h"
-
-// Forward-declare your function exactly as libft exports it
-char    *ft_foo(const char *s);
+#include "../../include/weak_functions.h"
 
 void    test_ft_foo(t_ctx *ctx)
 {
@@ -190,20 +191,28 @@ void    test_ft_foo(t_ctx *ctx)
 }
 ```
 
-**2. Register the suite in `tests/libft/registry.c`**
+**2. Add a weak declaration to `include/weak_functions.h`**
 
-Add a forward declaration at the top and an entry in `g_suites[]`:
+```c
+__attribute__((weak)) char  *ft_foo(const char *s);
+```
+
+This lets the runner detect when the function is absent (NULL weak symbol) and report it as `MISSING` rather than crashing.
+
+**3. Register the suite in `tests/libft/registry.c`**
+
+Add a forward declaration at the top and an entry in `g_suites[]`. The entry now takes four fields — name, test function, pointer to the libft function (for presence-checking), and a `1` flag to enable that check:
 
 ```c
 void    test_ft_foo(t_ctx *ctx);   // add with the other declarations
 
 static t_suite g_suites[] = {
     // ... existing entries ...
-    {"ft_foo", test_ft_foo},        // add at the end
+    {"ft_foo", test_ft_foo, (void *)ft_foo, 1},  // add at the end
 };
 ```
 
-**3. Add the file to the Makefile**
+**4. Add the file to the Makefile**
 
 Inside the `ifneq ($(LIBFT_DIR),)` block, append to `SRCS`:
 
@@ -219,7 +228,16 @@ Then `make re` and run `./tester ft_foo` to verify.
 
 To add tests for a completely new 42 project (e.g. `ft_printf`):
 
-**1. Create the project directory and files**
+**1. Add weak declarations to `include/weak_functions.h`**
+
+Add a labelled section for the new project's functions:
+
+```c
+/* ── MyProject ── */
+__attribute__((weak)) char  *ft_foo(const char *s);
+```
+
+**2. Create the project directory and files**
 
 ```
 tests/<project>/
@@ -227,15 +245,28 @@ tests/<project>/
 └── test_<name>.c    # one file per function/feature being tested
 ```
 
-`registry.c` must define a `get_<project>_project()` function that returns a `t_project *`:
+`test_<name>.c` includes `weak_functions.h` — no manual forward declarations needed:
 
 ```c
 #include "../../include/tester.h"
+#include "../../include/weak_functions.h"
+
+void    test_ft_foo(t_ctx *ctx)
+{
+    check_str(ctx, "basic case", "expected", ft_foo("input"));
+}
+```
+
+`registry.c` must define a `get_<project>_project()` function. Suite entries take four fields — name, test function, function pointer for presence-checking, and the check flag:
+
+```c
+#include "../../include/tester.h"
+#include "../../include/weak_functions.h"
 
 void    test_ft_foo(t_ctx *ctx);
 
 static t_suite g_suites[] = {
-    {"ft_foo", test_ft_foo},
+    {"ft_foo", test_ft_foo, (void *)ft_foo, 1},
 };
 
 static t_project g_project = {
@@ -250,7 +281,7 @@ t_project   *get_<project>_project(void)
 }
 ```
 
-**2. Register the project in `tests/registry.c`**
+**3. Register the project in `tests/registry.c`**
 
 ```c
 #ifdef WITH_MYPROJECT
@@ -263,6 +294,6 @@ t_project   *get_myproject_project(void);
 #endif
 ```
 
-**3. Wire it up in the Makefile**
+**4. Wire it up in the Makefile**
 
 Add a sibling-directory detection block and a conditional `SRCS +=` block following the same pattern as the existing `LIBFT_DIR` / `PRINTF_DIR` blocks.

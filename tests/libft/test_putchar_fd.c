@@ -7,7 +7,7 @@
 **   - Implementation itself is correct.
 */
 
-void	ft_putchar_fd(char c, int fd);
+#include "../../include/weak_functions.h"
 
 /* Write c to a fresh pipe and read back what arrived. */
 static void	t_putchar(t_ctx *ctx, const char *label, char c,

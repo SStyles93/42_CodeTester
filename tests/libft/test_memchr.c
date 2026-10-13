@@ -6,7 +6,7 @@
 ** Until fixed, this test file will fail to link (undefined reference).
 */
 
-void	*ft_memchr(const void *s, int c, size_t n);
+#include "../../include/weak_functions.h"
 
 static void	*ref_memchr(const void *s, int c, size_t n)
 {

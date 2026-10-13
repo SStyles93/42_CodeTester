@@ -1,8 +1,7 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 #include <limits.h>
-
-char	*ft_itoa(int n);
+#include "../../include/weak_functions.h"
 
 void	test_ft_itoa(t_ctx *ctx)
 {

@@ -1,9 +1,6 @@
 #include "../../include/tester.h"
-#include "libft.h"
 #include <stdlib.h>
-
-t_list	*ft_lstnew(void *content);
-t_list	*ft_lstlast(t_list *lst);
+#include "../../include/weak_functions.h"
 
 void	test_ft_lstlast(t_ctx *ctx)
 {

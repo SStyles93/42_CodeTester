@@ -1,9 +1,6 @@
 #include "../../include/tester.h"
-#include "libft.h"
 #include <stdlib.h>
-
-t_list	*ft_lstnew(void *content);
-void	ft_lstadd_front(t_list **lst, t_list *new);
+#include "../../include/weak_functions.h"
 
 void	test_ft_lstadd_front(t_ctx *ctx)
 {

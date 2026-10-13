@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+#include "../../include/weak_functions.h"
 
 void	test_ft_strlcpy(t_ctx *ctx)
 {

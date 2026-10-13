@@ -10,7 +10,7 @@
 **   - '#include "libft.h"' needs the Libft directory on the include path.
 */
 
-void	ft_putnbr_fd(int n, int fd);
+#include "../../include/weak_functions.h"
 
 static void	t_putnbr(t_ctx *ctx, const char *label, int n, const char *expected)
 {

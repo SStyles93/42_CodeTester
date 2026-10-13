@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-char	*ft_strchr(const char *s, int c);
+#include "../../include/weak_functions.h"
 
 static void	t_strchr(t_ctx *ctx, const char *label, const char *s, int c)
 {

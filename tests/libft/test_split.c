@@ -1,9 +1,7 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 #include <string.h>
-
-
-char	**ft_split(char const *s, char c);
+#include "../../include/weak_functions.h"
 
 static void	free_split(char **arr)
 {

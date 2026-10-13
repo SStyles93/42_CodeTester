@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
-
-char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
+#include "../../include/weak_functions.h"
 
 static char	to_upper(unsigned int i, char c)
 {

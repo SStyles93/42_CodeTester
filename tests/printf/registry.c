@@ -1,9 +1,10 @@
 #include "../../include/tester.h"
+#include "../../include/weak_functions.h"
 
 void	test_ft_printf(t_ctx *ctx);
 
 static t_suite	g_suites[] = {
-	{"ft_printf",      test_ft_printf},
+	{"ft_printf", test_ft_printf, (void *)ft_printf, 1},
 };
 
 static t_project	g_project = {

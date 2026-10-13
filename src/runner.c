@@ -95,6 +95,15 @@ static void	run_one(t_suite *suite, t_ctx *ctx)
 {
 	int	total;
 
+	if (suite->check_fn && suite->fn_ptr == NULL)
+	{
+		if (ctx->verbose)
+			printf(BOLD "\n── %s ──\n" RESET, suite->name);
+		printf("  " YELLOW "?" RESET " %-22s " YELLOW "MISSING" RESET "\n",
+			suite->name);
+		ctx->fail++;
+		return ;
+	}
 	if (ctx->verbose)
 		printf(BOLD "\n── %s ──\n" RESET, suite->name);
 	run_isolated(ctx, suite->name, call_suite, suite);

@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
-
-int	ft_atoi(const char *nptr);
+#include "../../include/weak_functions.h"
 
 void	test_ft_atoi(t_ctx *ctx)
 {

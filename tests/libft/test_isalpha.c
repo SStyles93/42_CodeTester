@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <ctype.h>
-
-int	ft_isalpha(int c);
+#include "../../include/weak_functions.h"
 
 void	test_ft_isalpha(t_ctx *ctx)
 {

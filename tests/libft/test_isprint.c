@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <ctype.h>
-
-int	ft_isprint(int c);
+#include "../../include/weak_functions.h"
 
 void	test_ft_isprint(t_ctx *ctx)
 {

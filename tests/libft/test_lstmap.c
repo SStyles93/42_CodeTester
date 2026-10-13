@@ -1,11 +1,6 @@
 #include "../../include/tester.h"
-#include "libft.h"
 #include <stdlib.h>
-
-t_list			*ft_lstnew(void *content);
-t_list			*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-void			ft_lstclear(t_list **lst, void (*del)(void *));
-unsigned int	ft_lstsize(t_list *lst);
+#include "../../include/weak_functions.h"
 
 static int	g_del_count;
 

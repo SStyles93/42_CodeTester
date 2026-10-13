@@ -30,6 +30,8 @@ typedef struct s_suite
 {
 	const char	*name;
 	void		(*run)(t_ctx *ctx);
+	void		*fn_ptr;
+	int			check_fn;
 }	t_suite;
 
 typedef struct s_project

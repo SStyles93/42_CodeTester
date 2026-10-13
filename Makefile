@@ -7,10 +7,17 @@ else
     LFLAGS  =
 endif
 
+# Colour defines (ANSI)
+GREEN =\033[0;32m #Light Green
+NC=\033[0m #No Colour
+
 NAME        = tester$(EXE)
 CC          = gcc
 CFLAGS      = -Wall -Wextra
 INCLUDES    = -I include
+
+# ── platform ─────────────────────────────────────────────────────────────────
+UNAME_S     := $(shell uname -s 2>/dev/null)
 
 # ── auto-detect student project directories ──────────────────────────────────
 LIBFT_DIR   := $(or $(wildcard ../libft),$(wildcard ../Libft),$(wildcard ../LIBFT))
@@ -26,11 +33,21 @@ SRCS        = src/main.c \
               src/memcheck.c \
               tests/registry.c
 
+
+
+# ─────────────────────────────────────────────────────────────
+# ──────────────────────── LIBFT BLOCK ────────────────────────
+# ─────────────────────────────────────────────────────────────
+
 ifneq ($(LIBFT_DIR),)
     LIBFT_A  = $(LIBFT_DIR)/libft.a
     CFLAGS   += -DWITH_LIBFT
     INCLUDES += -I $(LIBFT_DIR)
-    LINK_LIBS = $(LIBFT_A)
+    ifeq ($(UNAME_S),Darwin)
+        LINK_LIBS = -Wl,-all_load $(LIBFT_A)
+    else
+        LINK_LIBS = -Wl,--whole-archive $(LIBFT_A) -Wl,--no-whole-archive
+    endif
     LINK_DEPS = $(LIBFT_A)
     LIBFT_FCLEAN = @$(MAKE) --no-print-directory -C $(LIBFT_DIR) fclean
 
@@ -86,6 +103,12 @@ else
     LIBFT_FCLEAN = @true
 endif
 
+
+
+# ─────────────────────────────────────────────────────────────
+# ────────────────────── PRINTFT BLOCK ────────────────────────
+# ─────────────────────────────────────────────────────────────
+
 ifneq ($(PRINTF_DIR),)
     PRINTF_A     = $(PRINTF_DIR)/libftprintf.a
     CFLAGS       += -DWITH_PRINTF
@@ -101,12 +124,32 @@ else
     PRINTF_FCLEAN = @true
 endif
 
+# ─────────────────────────────────────────────────────────────
+# ────────────────────── OTHER BLOCK ──────────────────────────
+# ─────────────────────────────────────────────────────────────
+
+# ifneq ($(OTHER_DIR),)
+#     OTHER_A     = $(OTHER_DIR)/libname.a
+#     CFLAGS       += -DWITH_OTHER
+#     INCLUDES     += -I $(OTHER_DIR)
+#     LINK_LIBS    += $(OTHER_A)
+#     LINK_DEPS    += $(OTHER_A)
+#     OTHER_FCLEAN = @$(MAKE) --no-print-directory -C $(OTHER_DIR) fclean
+    
+#     # TEST TO ADD HERE IF NECESSARY
+#     SRCS         += tests/OTHER/registry.c \
+#                     tests/OTHER/test_ft_printf.c
+# else
+#     OTHER_FCLEAN = @true
+# endif
+
+
+
 OBJS        = $(SRCS:.c=.o)
 
 # ── memory checking ─────────────────────────────────────────────────────────
 # Linux: route malloc/calloc/free through src/memcheck.c (leak and
 # malloc-failure tests in the "memory" suite). Needs GNU ld's --wrap.
-UNAME_S     := $(shell uname -s 2>/dev/null)
 ifeq ($(UNAME_S),Linux)
     CFLAGS  += -DMEMCHECK_WRAP
     LFLAGS  += -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=free
@@ -134,7 +177,10 @@ all: $(NAME)
 
 $(NAME): $(MODE_STAMP) $(LINK_DEPS) $(OBJS)
 	$(CC) $(OBJS) $(LINK_LIBS) $(LFLAGS) -o $(NAME)
-	@echo "Build complete. Run with: ./tester"
+	@echo "\n────────────────────────────────────────────────" \
+	"\n    Build complete. Run with: $(GREEN)./tester$(NC)" \
+	"\n────────────────────────────────────────────────\n"
+    
 
 ifneq ($(LIBFT_DIR),)
 # Always ask libft's Makefile, so edits to libft sources are picked up.
@@ -147,10 +193,16 @@ $(PRINTF_A): FORCE
 	@$(MAKE) --no-print-directory -C $(PRINTF_DIR) all
 endif
 
+# ifneq ($(OTHER_DIR),)
+# $(OTHER_A): FORCE
+# 	@$(MAKE) --no-print-directory -C $(OTHER_DIR) all
+# endif
+
 $(MODE_STAMP):
 	@rm -f .build_mode_*
 	$(LIBFT_FCLEAN)
 	$(PRINTF_FCLEAN)
+    #$(OTHER_FCLEAN)
 	@rm -f $(OBJS) $(NAME)
 	@touch $@
 
@@ -174,6 +226,7 @@ fclean: clean
 	rm -f $(NAME) .build_mode_*
 	$(LIBFT_FCLEAN)
 	$(PRINTF_FCLEAN)
+    #$(OTHER_FCLEAN)
 
 re: fclean all
 

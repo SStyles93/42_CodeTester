@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-void	ft_striteri(char *s, void (*f)(unsigned int, char *));
+#include "../../include/weak_functions.h"
 
 /* ---- helper state ---- */
 static unsigned int	g_indices[32];

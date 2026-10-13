@@ -1,4 +1,5 @@
 #include "../../include/tester.h"
+#include "../../include/weak_functions.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,21 +12,12 @@
 ** Needs the malloc wrapper from src/memcheck.c (Linux only).
 */
 
-char			*ft_strdup(const char *s);
-char			*ft_substr(char const *s, unsigned int start, size_t len);
-char			*ft_strjoin(char const *s1, char const *s2);
-char			*ft_strtrim(char const *s1, char const *set);
-char			**ft_split(char const *s, char c);
-char			*ft_itoa(int n);
-char			*ft_strmapi(char const *s, char (*f)(unsigned int, char));
-void			*ft_calloc(size_t nmemb, size_t size);
-struct s_list	*ft_lstnew(void *content);
-
 typedef struct s_memcase
 {
 	const char	*name;
 	void		*(*call)(void);
 	void		(*release)(void *result);
+	const void	*fn;
 }	t_memcase;
 
 static char	map_upper(unsigned int i, char c)
@@ -140,15 +132,15 @@ static void	check_case(t_ctx *ctx, const void *arg)
 void	test_memory(t_ctx *ctx)
 {
 	static const t_memcase	cases[] = {
-		{"ft_strdup", call_strdup, release_plain},
-		{"ft_substr", call_substr, release_plain},
-		{"ft_strjoin", call_strjoin, release_plain},
-		{"ft_strtrim", call_strtrim, release_plain},
-		{"ft_split", call_split, release_split},
-		{"ft_itoa", call_itoa, release_plain},
-		{"ft_strmapi", call_strmapi, release_plain},
-		{"ft_calloc", call_calloc, release_plain},
-		{"ft_lstnew", call_lstnew, release_plain},
+		{"ft_strdup",  call_strdup,  release_plain, (const void *)ft_strdup},
+		{"ft_substr",  call_substr,  release_plain, (const void *)ft_substr},
+		{"ft_strjoin", call_strjoin, release_plain, (const void *)ft_strjoin},
+		{"ft_strtrim", call_strtrim, release_plain, (const void *)ft_strtrim},
+		{"ft_split",   call_split,   release_split, (const void *)ft_split},
+		{"ft_itoa",    call_itoa,    release_plain, (const void *)ft_itoa},
+		{"ft_strmapi", call_strmapi, release_plain, (const void *)ft_strmapi},
+		{"ft_calloc",  call_calloc,  release_plain, (const void *)ft_calloc},
+		{"ft_lstnew",  call_lstnew,  release_plain, (const void *)ft_lstnew},
 	};
 	size_t					i;
 
@@ -162,7 +154,10 @@ void	test_memory(t_ctx *ctx)
 	/* each function in its own process: one crash doesn't hide the rest */
 	while (i < sizeof(cases) / sizeof(cases[0]))
 	{
-		run_isolated(ctx, cases[i].name, check_case, &cases[i]);
+		if (!cases[i].fn)
+			printf("    " YELLOW "⚠ MISSING" RESET " %s\n", cases[i].name);
+		else
+			run_isolated(ctx, cases[i].name, check_case, &cases[i]);
 		i++;
 	}
 }

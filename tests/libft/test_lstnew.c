@@ -1,8 +1,6 @@
 #include "../../include/tester.h"
-#include "libft.h"
 #include <stdlib.h>
-
-t_list	*ft_lstnew(void *content);
+#include "../../include/weak_functions.h"
 
 void	test_ft_lstnew(t_ctx *ctx)
 {

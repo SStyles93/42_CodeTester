@@ -1,8 +1,7 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 #include <string.h>
-
-void	*ft_calloc(size_t nmemb, size_t size);
+#include "../../include/weak_functions.h"
 
 void	test_ft_calloc(t_ctx *ctx)
 {

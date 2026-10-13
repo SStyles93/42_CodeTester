@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
-
-char	*ft_strtrim(char const *s1, char const *set);
+#include "../../include/weak_functions.h"
 
 void	test_ft_strtrim(t_ctx *ctx)
 {

@@ -1,8 +1,7 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 #include <string.h>
-
-char	*ft_strdup(const char *s);
+#include "../../include/weak_functions.h"
 
 void	test_ft_strdup(t_ctx *ctx)
 {

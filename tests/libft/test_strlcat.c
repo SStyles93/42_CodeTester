@@ -1,13 +1,12 @@
 #include "../../include/tester.h"
 #include <string.h>
+#include "../../include/weak_functions.h"
 
 /*
 ** NOTE: ft_strlcat.c calls strlen() without #include <string.h>.
 ** Add that include to ft_strlcat.c or it will fail to compile with -Werror.
 ** Also: ft_strlcat uses unsigned int instead of size_t (non-standard).
 */
-
-size_t	ft_strlcat(char *dst, const char *src, size_t size);
 
 void	test_ft_strlcat(t_ctx *ctx)
 {

@@ -1,7 +1,6 @@
 #include "../../include/tester.h"
 #include <string.h>
-
-void	ft_putendl_fd(char *s, int fd);
+#include "../../include/weak_functions.h"
 
 static void	t_putendl(t_ctx *ctx, const char *label, const char *s,
 	const char *expected)

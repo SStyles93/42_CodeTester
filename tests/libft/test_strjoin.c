@@ -1,8 +1,7 @@
 #include "../../include/tester.h"
 #include <stdlib.h>
 #include <string.h>
-
-char	*ft_strjoin(char const *s1, char const *s2);
+#include "../../include/weak_functions.h"
 
 void	test_ft_strjoin(t_ctx *ctx)
 {
