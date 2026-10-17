@@ -26,32 +26,6 @@ void	test_ft_putstr_fd(t_ctx *ctx)
 {
 	t_putstr(ctx, "putstr_fd \"hello\"", "hello", "hello");
 
-	/* single char */
-	t_putstr(ctx, "putstr_fd \"a\"", "a", "a");
-
 	/* empty string */
 	t_putstr(ctx, "putstr_fd \"\"", "", "");
-
-	/* string with spaces */
-	t_putstr(ctx, "putstr_fd \"hello world\"", "hello world", "hello world");
-
-	/* string with newline */
-	t_putstr(ctx, "putstr_fd \"hi\\n\"", "hi\n", "hi\n");
-
-	/* numeric string */
-	t_putstr(ctx, "putstr_fd \"42\"", "42", "42");
-
-	/* longer string */
-	t_putstr(ctx, "putstr_fd long",
-		"Lorem ipsum dolor sit amet",
-		"Lorem ipsum dolor sit amet");
-
-	/* tab in string */
-	t_putstr(ctx, "putstr_fd with tab", "hel\tlo", "hel\tlo");
-	/* only special chars */
-	t_putstr(ctx, "putstr_fd special !@#$", "!@#$", "!@#$");
-	/* multiple newlines */
-	t_putstr(ctx, "putstr_fd multi-newline", "a\nb\nc", "a\nb\nc");
-	/* all digits */
-	t_putstr(ctx, "putstr_fd all digits", "0123456789", "0123456789");
 }

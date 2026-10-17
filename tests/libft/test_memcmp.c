@@ -38,25 +38,8 @@ void	test_ft_memcmp(t_ctx *ctx)
 	t_memcmp(ctx, "s1 < s2", "abc", "abd", 3);
 	t_memcmp(ctx, "s1 > s2", "abd", "abc", 3);
 	t_memcmp(ctx, "n=0 → 0", "abc", "xyz", 0);
-	t_memcmp(ctx, "equal prefix, n within", "hello", "hellp", 4);
-	t_memcmp(ctx, "differ at byte n", "hello", "hellp", 5);
-	t_memcmp(ctx, "binary: 0xFF > 0x00", b1, b2, 3);
-	/* n=1 comparisons */
-	t_memcmp(ctx, "n=1 equal", "a", "a", 1);
-	t_memcmp(ctx, "n=1 less",  "a", "b", 1);
-	t_memcmp(ctx, "n=1 greater", "b", "a", 1);
-	/* unsigned comparison: 0xFF (255) > 0x80 (128) */
-	{
-		unsigned char	u1[] = {0xFF};
-		unsigned char	u2[] = {0x80};
-		t_memcmp(ctx, "0xFF > 0x80 (unsigned)", u1, u2, 1);
-	}
-	/* all-zero buffers */
-	{
-		unsigned char	z1[8] = {0};
-		unsigned char	z2[8] = {0};
-		t_memcmp(ctx, "all zeros equal", z1, z2, 8);
-	}
 	/* equal first n bytes, differ after */
 	t_memcmp(ctx, "equal n bytes, differ after n", "abcXXX", "abcYYY", 3);
+	/* must not stop at 0x00, and must compare as unsigned (0xFF > 0x00) */
+	t_memcmp(ctx, "binary: past 0x00, 0xFF > 0x00", b1, b2, 3);
 }

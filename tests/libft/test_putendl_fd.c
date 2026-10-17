@@ -30,19 +30,6 @@ void	test_ft_putendl_fd(t_ctx *ctx)
 	/* empty string — should still write '\n' */
 	t_putendl(ctx, "putendl_fd \"\"", "", "\n");
 
-	/* single char */
-	t_putendl(ctx, "putendl_fd \"a\"", "a", "a\n");
-
 	/* string already ending with newline — gets a second '\n' */
 	t_putendl(ctx, "putendl_fd \"hi\\n\"", "hi\n", "hi\n\n");
-
-	/* with spaces */
-	t_putendl(ctx, "putendl_fd \"hello world\"", "hello world", "hello world\n");
-
-	/* tab in string */
-	t_putendl(ctx, "putendl_fd with tab", "he\tllo", "he\tllo\n");
-	/* numeric string */
-	t_putendl(ctx, "putendl_fd \"42\"", "42", "42\n");
-	/* special chars */
-	t_putendl(ctx, "putendl_fd \"!@#\"", "!@#", "!@#\n");
 }

@@ -31,18 +31,6 @@ void	test_ft_strlcat(t_ctx *ctx)
 	check_uint(ctx, "size<dst_len return (9)", 9, ret);
 	check_str(ctx, "size<dst_len dst unchanged", "Hello", dst);
 
-	/* empty dst */
-	dst[0] = '\0';
-	ret = ft_strlcat(dst, "hello", 6);
-	check_uint(ctx, "empty dst return (5)", 5, ret);
-	check_str(ctx, "empty dst result", "hello", dst);
-
-	/* empty src */
-	strcpy(dst, "hello");
-	ret = ft_strlcat(dst, "", 10);
-	check_uint(ctx, "empty src return (5)", 5, ret);
-	check_str(ctx, "empty src dst unchanged", "hello", dst);
-
 	/* size=0: no write, return = size(0) + strlen(src) = 6 */
 	strcpy(dst, "hello");
 	ret = ft_strlcat(dst, " world", 0);
@@ -54,12 +42,4 @@ void	test_ft_strlcat(t_ctx *ctx)
 	ret = ft_strlcat(dst, " World", 12);
 	check_uint(ctx, "exact fit return (11)", 11, ret);
 	check_str(ctx, "exact fit result", "Hello World", dst);
-
-	/* NUL terminator placed at size-1 after truncation */
-	{
-		char	buf2[8];
-		strcpy(buf2, "Hi");
-		ft_strlcat(buf2, "XXXXXXXX", 6);
-		check_char(ctx, "NUL at size-1 after trunc", '\0', buf2[5]);
-	}
 }

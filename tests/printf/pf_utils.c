@@ -4,8 +4,6 @@
 
 char	g_pf_exp[PF_BUF_SIZE];
 char	g_pf_got[PF_BUF_SIZE];
-/* When set, verbose mode only prints failing cases (for the big suites). */
-int		g_pf_quiet = 0;
 
 int	pf_capture_begin(t_pfcap *cap)
 {
@@ -100,7 +98,7 @@ void	pf_report(t_ctx *ctx, const char *label, const t_pfcase *c)
 		ctx->pass++;
 	else
 		ctx->fail++;
-	if (!ctx->verbose || (ok && g_pf_quiet))
+	if (!ctx->verbose)
 		return ;
 	if (ok)
 	{

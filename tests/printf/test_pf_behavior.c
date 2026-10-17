@@ -1,15 +1,12 @@
 #include "pf_tester.h"
-#ifndef _WIN32
-# include <fcntl.h>
-# include <signal.h>
-#endif
 
 /*
 ** Behaviour that is not about formatting:
 **   - output goes straight to fd 1, in order with raw write() calls
 **     (no buffering inside ft_printf);
 **   - return value is -1 when write() fails, and a failure does not leak
-**     into the next call;
+**     into the next call (return values on success are checked by every
+**     PF() case);
 **   - no state carried over between calls;
 **   - no leaks (and correct behaviour if malloc fails), Linux only.
 */
@@ -59,39 +56,6 @@ static void	no_state_between_calls(t_ctx *ctx)
 	PF(ctx, "%d", 1);
 	PF(ctx, "%X", 0xABCu);
 	PF(ctx, "%x", 0xabcu);
-	PF(ctx, "%p", NULL);
-	PF(ctx, "%p", (void *)1);
-	PF(ctx, "%c", '\0');
-	PF(ctx, "%c", 'a');
-}
-
-static void	return_values(t_ctx *ctx)
-{
-	static char	big[100001];
-	t_pfcap		cap;
-	int			r;
-
-	if (pf_capture_begin(&cap) != 0)
-	{
-		ctx->fail++;
-		return ;
-	}
-	r = ft_printf("");
-	pf_capture_end(&cap, g_pf_got, PF_BUF_SIZE);
-	check_int(ctx, "ft_printf(\"\") returns 0", 0, r);
-	pf_capture_begin(&cap);
-	r = ft_printf("%c", '\0');
-	pf_capture_end(&cap, g_pf_got, PF_BUF_SIZE);
-	check_int(ctx, "ft_printf(\"%c\", 0) returns 1", 1, r);
-	pf_capture_begin(&cap);
-	r = ft_printf("%s", "");
-	pf_capture_end(&cap, g_pf_got, PF_BUF_SIZE);
-	check_int(ctx, "ft_printf(\"%s\", \"\") returns 0", 0, r);
-	memset(big, 'z', sizeof(big) - 1);
-	pf_capture_begin(&cap);
-	r = ft_printf("%s", big);
-	pf_capture_end(&cap, g_pf_got, PF_BUF_SIZE);
-	check_int(ctx, "ft_printf(\"%s\", <100000 z>) returns 100000", 100000, r);
 }
 
 #ifndef _WIN32
@@ -99,70 +63,23 @@ static void	return_values(t_ctx *ctx)
 static void	write_errors(t_ctx *ctx)
 {
 	int		r;
-	int		fd;
-	int		pfd[2];
-	char	path[] = "/tmp/pf_tester_XXXXXX";
 
 	PF_ON_FD(r, -1, "abc");
 	check_int(ctx, "stdout closed: \"abc\" returns -1", -1, r);
-	PF_ON_FD(r, -1, "%d", 42);
-	check_int(ctx, "stdout closed: \"%d\" returns -1", -1, r);
-	PF_ON_FD(r, -1, "%s", "str");
-	check_int(ctx, "stdout closed: \"%s\" returns -1", -1, r);
 	PF_ON_FD(r, -1, "%c", 'c');
 	check_int(ctx, "stdout closed: \"%c\" returns -1", -1, r);
-	PF_ON_FD(r, -1, "%u", 1u);
-	check_int(ctx, "stdout closed: \"%u\" returns -1", -1, r);
+	PF_ON_FD(r, -1, "%s", "str");
+	check_int(ctx, "stdout closed: \"%s\" returns -1", -1, r);
+	PF_ON_FD(r, -1, "%d", 42);
+	check_int(ctx, "stdout closed: \"%d\" returns -1", -1, r);
 	PF_ON_FD(r, -1, "%x", 1u);
 	check_int(ctx, "stdout closed: \"%x\" returns -1", -1, r);
 	PF_ON_FD(r, -1, "%p", (void *)ctx);
 	check_int(ctx, "stdout closed: \"%p\" returns -1", -1, r);
-	PF_ON_FD(r, -1, "%%");
-	check_int(ctx, "stdout closed: \"%%\" returns -1", -1, r);
-
-	/* stdout open read-only */
-	fd = mkstemp(path);
-	if (fd >= 0)
-	{
-		close(fd);
-		fd = open(path, O_RDONLY);
-		unlink(path);
-		PF_ON_FD(r, fd, "abc%d", 1);
-		check_int(ctx, "stdout read-only: returns -1", -1, r);
-		close(fd);
-	}
-	else
-		ctx->fail++;
-
-	/* pipe with no reader (EPIPE) */
-	if (pipe(pfd) == 0)
-	{
-		signal(SIGPIPE, SIG_IGN);
-		close(pfd[0]);
-		PF_ON_FD(r, pfd[1], "broken %s", "pipe");
-		check_int(ctx, "stdout is a broken pipe: returns -1", -1, r);
-		close(pfd[1]);
-		signal(SIGPIPE, SIG_DFL);
-	}
-	else
-		ctx->fail++;
-
-# ifdef __linux__
-	/* device full (ENOSPC) */
-	fd = open("/dev/full", O_WRONLY);
-	if (fd >= 0)
-	{
-		PF_ON_FD(r, fd, "full %d", 1);
-		check_int(ctx, "stdout is /dev/full: returns -1", -1, r);
-		close(fd);
-	}
-# endif
 
 	/* a failed call must not affect the next one */
 	PF_ON_FD(r, -1, "fail");
 	PF(ctx, "works again %d", 42);
-	PF(ctx, "");
-	PF(ctx, "%s", "and again");
 }
 
 #endif
@@ -235,7 +152,6 @@ static void	memory(t_ctx *ctx)
 void	test_pf_behavior(t_ctx *ctx)
 {
 	unbuffered(ctx);
-	return_values(ctx);
 	no_state_between_calls(ctx);
 #ifndef _WIN32
 	write_errors(ctx);

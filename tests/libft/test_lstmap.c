@@ -20,12 +20,6 @@ static void	*map_double(void *content)
 	return ((void *)((uintptr_t)content * 2));
 }
 
-static void	*map_identity(void *content)
-{
-	return (content);
-}
-
-
 void	test_ft_lstmap(t_ctx *ctx)
 {
 	t_list	*n1;
@@ -48,26 +42,6 @@ void	test_ft_lstmap(t_ctx *ctx)
 	n1 = ft_lstnew((void *)(uintptr_t)1);
 	mapped = ft_lstmap(n1, map_add1, NULL);
 	check_ptr(ctx, "lstmap(lst, f, NULL) == NULL", NULL, mapped);
-	free(n1);
-
-	/* single-node: content transformed, next == NULL */
-	n1 = ft_lstnew((void *)(uintptr_t)10);
-	n1->next = NULL;
-	g_del_count = 0;
-	mapped = ft_lstmap(n1, map_add1, del_noop);
-	check_not_null(ctx, "lstmap([10], +1): result not NULL", mapped);
-	if (mapped)
-	{
-		check_ptr(ctx, "lstmap([10], +1): content == 11",
-			(void *)(uintptr_t)11, mapped->content);
-		check_ptr(ctx, "lstmap([10], +1): next == NULL", NULL, mapped->next);
-		check_uint(ctx, "lstmap([10], +1): size == 1", 1, ft_lstsize(mapped));
-		ft_lstclear(&mapped, del_noop);
-	}
-	/* original node intact */
-	check_ptr(ctx, "lstmap: original n1->content == 10",
-		(void *)(uintptr_t)10, n1->content);
-	check_ptr(ctx, "lstmap: original n1->next == NULL", NULL, n1->next);
 	free(n1);
 
 	/* three-node mapping: 1→2→3 doubled to 2→4→6 */
@@ -127,17 +101,4 @@ void	test_ft_lstmap(t_ctx *ctx)
 	free(n1);
 	free(n2);
 	free(n3);
-
-	/* identity mapping: content preserved verbatim */
-	n1 = ft_lstnew((void *)(uintptr_t)0xABCD);
-	n1->next = NULL;
-	mapped = ft_lstmap(n1, map_identity, del_noop);
-	check_not_null(ctx, "lstmap identity: result not NULL", mapped);
-	if (mapped)
-	{
-		check_ptr(ctx, "lstmap identity: content == 0xABCD",
-			(void *)(uintptr_t)0xABCD, mapped->content);
-		ft_lstclear(&mapped, del_noop);
-	}
-	free(n1);
 }

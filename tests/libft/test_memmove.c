@@ -28,14 +28,6 @@ void	test_ft_memmove(t_ctx *ctx)
 	void	*ret = ft_memmove(buf + 2, buf, 3);
 	check_ptr(ctx, "returns dest pointer", (void *)(buf + 2), ret);
 
-	/* n=1 overlap */
-	{
-		char	rbuf2[8] = "XY";
-		char	gbuf2[8] = "XY";
-		memmove(rbuf2 + 1, rbuf2, 1);
-		ft_memmove(gbuf2 + 1, gbuf2, 1);
-		check_mem(ctx, "memmove n=1 overlap", rbuf2, gbuf2, 4);
-	}
 	/* src == dst: must be a no-op */
 	{
 		char	same[8] = "ABCDEFG";

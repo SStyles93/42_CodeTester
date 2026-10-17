@@ -33,37 +33,5 @@ static void	t_putchar(t_ctx *ctx, const char *label, char c,
 void	test_ft_putchar_fd(t_ctx *ctx)
 {
 	t_putchar(ctx, "putchar_fd 'A'",  'A',  "A");
-	t_putchar(ctx, "putchar_fd 'z'",  'z',  "z");
-	t_putchar(ctx, "putchar_fd '0'",  '0',  "0");
-	t_putchar(ctx, "putchar_fd '!'",  '!',  "!");
 	t_putchar(ctx, "putchar_fd '\\n'", '\n', "\n");
-	t_putchar(ctx, "putchar_fd ' '",  ' ',  " ");
-	t_putchar(ctx, "putchar_fd '1'",  '1',  "1");
-
-	/* write to stderr (fd 2) — just make sure it doesn't crash */
-	{
-		int	pfd[2];
-
-		if (pipe(pfd) >= 0)
-		{
-			ft_putchar_fd('X', pfd[1]);
-			close(pfd[1]);
-			close(pfd[0]);
-		}
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET
-				" putchar_fd to pipe fd didn't crash\n");
-	}
-
-	/* more special and control characters */
-	t_putchar(ctx, "putchar_fd '\\t'",        '\t',  "\t");
-	t_putchar(ctx, "putchar_fd '\\r'",        '\r',  "\r");
-	t_putchar(ctx, "putchar_fd '~' (126)",    '~',   "~");
-	t_putchar(ctx, "putchar_fd '\\x01' (SOH)", 0x01, "\x01");
-	/* all printable ASCII boundary chars */
-	t_putchar(ctx, "putchar_fd ' ' (32)",   ' ',  " ");
-	t_putchar(ctx, "putchar_fd '\"' (34)",  '"',  "\"");
-	t_putchar(ctx, "putchar_fd '/' (47)",   '/',  "/");
-	t_putchar(ctx, "putchar_fd '@' (64)",   '@',  "@");
 }

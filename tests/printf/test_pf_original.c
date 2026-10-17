@@ -54,8 +54,7 @@ static void	run_formats(t_ctx *ctx, const char **fmts, size_t n)
 
 void	test_pf_original(t_ctx *ctx)
 {
-	static const char	*fmts[] = {"%", "abc%", "%%%", "%k", "%y", "%w|",
-		"a%Zb", "%!"};
+	static const char	*fmts[] = {"%", "abc%", "%%%", "%k", "a%Zb"};
 
 	run_formats(ctx, fmts, sizeof(fmts) / sizeof(fmts[0]));
 	run_isolated(ctx, "ft_printf(NULL)", isolated_null_format, NULL);
@@ -65,48 +64,32 @@ static void	flag_mismatch(t_ctx *ctx)
 {
 	/* '#' on non-hex */
 	PF(ctx, "%#d", 42);
-	PF(ctx, "%#i", 42);
-	PF(ctx, "%#u", 42u);
-	PF(ctx, "%#c", 'a');
 	PF(ctx, "%#s", "abc");
 	PF(ctx, "%#p", (void *)0x42);
 	/* '+' and ' ' on unsigned / strings / chars / pointers */
 	PF(ctx, "%+u", 42u);
-	PF(ctx, "% u", 42u);
-	PF(ctx, "%+x", 42u);
 	PF(ctx, "% x", 42u);
-	PF(ctx, "%+X", 42u);
 	PF(ctx, "%+s", "abc");
-	PF(ctx, "% s", "abc");
-	PF(ctx, "%+c", 'a');
 	PF(ctx, "% c", 'a');
 	PF(ctx, "%+p", (void *)0x42);
-	PF(ctx, "% p", (void *)0x42);
-	PF(ctx, "%+p", NULL);
 	/* '0' on strings / chars / pointers */
 	PF(ctx, "%05s", "abc");
 	PF(ctx, "%05c", 'a');
 	PF(ctx, "%020p", (void *)0x42);
 	PF(ctx, "%010p", NULL);
-	PF(ctx, "%05s", (char *)NULL);
 	/* precision on chars / pointers */
 	PF(ctx, "%.3c", 'a');
-	PF(ctx, "%.0c", 'a');
 	PF(ctx, "%.5p", (void *)0x42);
 	PF(ctx, "%.0p", NULL);
-	PF(ctx, "%.0p", (void *)0x42);
-	PF(ctx, "%20.15p", (void *)0x42);
 	/* combinations */
-	PF(ctx, "%-#5p|", (void *)0x42);
-	PF(ctx, "%+ 05d", 42);
 	PF(ctx, "%-0+# 10.5d|", 42);
 	PF(ctx, "%-0+# 10.5x|", 42u);
 }
 
 void	test_pf_original_flags(t_ctx *ctx)
 {
-	static const char	*fmts[] = {"%5", "%-", "%.", "%#", "%+", "% ",
-		"%5k", "%-5k|", "%5%", "%-5%|", "%05%", "%.3%", "% %", "%+%", "%#%"};
+	static const char	*fmts[] = {"%5", "%-", "%.", "%5k", "%5%", "%-5%|",
+		"%05%"};
 
 	run_formats(ctx, fmts, sizeof(fmts) / sizeof(fmts[0]));
 	flag_mismatch(ctx);

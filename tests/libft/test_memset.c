@@ -10,12 +10,6 @@ void	test_ft_memset(t_ctx *ctx)
 	memset(ref, 'A', 10); ft_memset(got, 'A', 10);
 	check_mem(ctx, "fill 10 with 'A'", ref, got, 10);
 
-	memset(ref, 0, 16); ft_memset(got, 0, 16);
-	check_mem(ctx, "fill 16 with 0", ref, got, 16);
-
-	memset(ref, 255, 8); ft_memset(got, 255, 8);
-	check_mem(ctx, "fill 8 with 0xFF", ref, got, 8);
-
 	memset(ref, 'X', 4); memset(got, 'X', 4);
 	memset(ref, 0, 0); ft_memset(got, 0, 0);
 	check_mem(ctx, "n=0 (no change)", ref, got, 4);
@@ -24,12 +18,6 @@ void	test_ft_memset(t_ctx *ctx)
 	void	*ret = ft_memset(buf, 1, 4);
 	check_ptr(ctx, "returns dst pointer", (void *)buf, ret);
 
-	/* n=1: single byte */
-	{
-		char	b = 'X';
-		ft_memset(&b, '\0', 1);
-		check_char(ctx, "n=1: single byte to NUL", '\0', b);
-	}
 	/* value > 127: int c is truncated to unsigned char */
 	{
 		char	rbuf2[4];

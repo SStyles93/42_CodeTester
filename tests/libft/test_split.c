@@ -71,109 +71,48 @@ static void	check_split(t_ctx *ctx, const char *label,
 	free_split(got);
 }
 
+static void	check_split_empty(t_ctx *ctx, const char *label, char **got)
+{
+	if (got && got[0] == NULL)
+	{
+		ctx->pass++;
+		if (ctx->verbose)
+			printf("    " GREEN "✓" RESET " %s → empty array\n", label);
+		free(got);
+	}
+	else
+	{
+		ctx->fail++;
+		if (ctx->verbose)
+			printf("    " RED "✗" RESET " %s → expected empty array\n", label);
+		free_split(got);
+	}
+}
+
 void	test_ft_split(t_ctx *ctx)
 {
-	char		**r;
-	const char	*exp0[] = {NULL};
-	const char	*exp1[] = {"hello", NULL};
-	const char	*exp3[] = {"hello", "world", "foo"};
+	const char	*exp1[] = {"hello"};
 	const char	*exp_abc[] = {"a", "b", "c"};
 	const char	*exp2[] = {"one", "two"};
 
 	/* empty string → empty array with just NULL */
-	r = ft_split("", ' ');
-	if (r && r[0] == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " split(\"\") → empty array\n");
-		free(r);
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " split(\"\") → expected empty array\n");
-		free_split(r);
-	}
-	(void)exp0;
+	check_split_empty(ctx, "split(\"\",' ')", ft_split("", ' '));
+
+	/* all separators → empty array */
+	check_split_empty(ctx, "split(\"   \",' ')", ft_split("   ", ' '));
 
 	/* single word, no sep */
-	r = ft_split("hello", ' ');
-	check_split(ctx, "split(\"hello\",' ')", r, exp1, 1);
+	check_split(ctx, "split(\"hello\",' ')", ft_split("hello", ' '), exp1, 1);
 
-	/* three words */
-	r = ft_split("hello world foo", ' ');
-	check_split(ctx, "split(\"hello world foo\",' ')", r, exp3, 3);
-
-	/* colon separator */
-	r = ft_split("a:b:c", ':');
-	check_split(ctx, "split(\"a:b:c\",':')", r, exp_abc, 3);
+	/* non-space separator */
+	check_split(ctx, "split(\"a:b:c\",':')", ft_split("a:b:c", ':'), exp_abc, 3);
 
 	/* leading separator */
-	r = ft_split(" one two", ' ');
-	check_split(ctx, "split(\" one two\",' ')", r, exp2, 2);
+	check_split(ctx, "split(\" one two\",' ')", ft_split(" one two", ' '), exp2, 2);
 
 	/* trailing separator */
-	r = ft_split("one two ", ' ');
-	check_split(ctx, "split(\"one two \",' ')", r, exp2, 2);
+	check_split(ctx, "split(\"one two \",' ')", ft_split("one two ", ' '), exp2, 2);
 
 	/* multiple consecutive separators */
-	r = ft_split("one   two", ' ');
-	check_split(ctx, "split(\"one   two\",' ')", r, exp2, 2);
-
-	/* all separators */
-	r = ft_split("   ", ' ');
-	if (r && r[0] == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " split(\"   \",' ') → empty array\n");
-		free(r);
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " split(\"   \",' ') → expected empty array\n");
-		free_split(r);
-	}
-
-	/* single char equal to separator → empty array */
-	r = ft_split(" ", ' ');
-	if (r && r[0] == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " split(\" \",' ') → empty array\n");
-		free(r);
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " split(\" \",' ') → expected empty array\n");
-		free_split(r);
-	}
-
-	/* newline separator */
-	{
-		const char	*exp_nl[] = {"line1", "line2"};
-		r = ft_split("line1\nline2", '\n');
-		check_split(ctx, "split(\"line1\\nline2\",'\\n')", r, exp_nl, 2);
-	}
-
-	/* tab separator */
-	{
-		const char	*exp_tab[] = {"a", "b", "c"};
-		r = ft_split("a\tb\tc", '\t');
-		check_split(ctx, "split(\"a\\tb\\tc\",'\\t')", r, exp_tab, 3);
-	}
-
-	/* single word, separator appears nowhere */
-	{
-		const char	*exp_one[] = {"hello"};
-		r = ft_split("hello", ':');
-		check_split(ctx, "split(\"hello\",':') no sep", r, exp_one, 1);
-	}
+	check_split(ctx, "split(\"one   two\",' ')", ft_split("one   two", ' '), exp2, 2);
 }

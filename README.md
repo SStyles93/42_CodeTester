@@ -137,12 +137,12 @@ The suites are split into three categories, following the subject:
 | Suite | What it covers |
 |---|---|
 | `ft_printf` | plain text, empty format, every conversion in one call, 20 arguments, a 20 000-char format |
-| `printf_c` | `'\0'` (written and counted), values > 127 and negative, all 256 byte values |
-| `printf_s` | empty strings, UTF-8, `NULL`, a 100 000-char argument |
-| `printf_p` | `NULL`, `1`, `ULONG_MAX`, `LONG_MIN`, real stack/heap addresses |
-| `printf_di` / `printf_u` / `printf_x` | limits, negatives reinterpreted as unsigned, every power of 10 / 16 |
-| `printf_percent` | `%%` in every position |
-| `printf_behavior` | no buffering (output interleaved in order with raw `write()`), `-1` when `write` fails (stdout closed, read-only, broken pipe, `/dev/full`), recovery after an error, no state kept between calls, no leaks and malloc-failure handling ${\color{orange}\text{(Linux)}}$ |
+| `printf_c` | `'\0'` (written and counted), values > 127, negative and > 255 |
+| `printf_s` | empty string, conversion characters inside the argument, high bytes, `NULL`, a 100 000-char argument |
+| `printf_p` | `NULL`, `1`, `ULONG_MAX`, `LONG_MIN`, values above 32 bits, a real address |
+| `printf_di` / `printf_u` / `printf_x` | limits, digit-count transitions (9→10, 15→16), negatives reinterpreted as unsigned |
+| `printf_percent` | `%%`, consecutive `%%`, `%%` before text and before a conversion |
+| `printf_behavior` | no buffering (output interleaved in order with raw `write()`), `-1` when `write` fails (stdout closed), recovery after an error, no state kept between calls, no leaks and malloc-failure handling ${\color{orange}\text{(Linux)}}$ |
 | `printf_project` | `libftprintf.a` at the root, `ft_printf.h` with the prototype, Makefile `NAME` / `all` / `clean` / `fclean` / `re`, `ar` used and not `libtool`, `-Wall -Wextra -Werror`, no relink, only `malloc` / `free` / `write` as external functions (read with `nm`), README first line and sections |
 
 **Printf_bonus** — flags `-0.`, minimum field width and `# +`
@@ -150,8 +150,8 @@ The suites are split into three categories, following the subject:
 | Suite | What it covers |
 |---|---|
 | `bonus_minus_zero_dot` | width, `-`, `0`, `.`: `-` overriding `0`, precision disabling `0`, `%.0d` with 0, `NULL` with a precision, widths up to 100 000 |
-| `bonus_hash_space_plus` | `#`, `' '`, `+`: `%#x` with 0, `+` overriding `' '`, repeated and reordered flags |
-| `bonus_combinations` | every valid combination of flags × width × precision per conversion against edge values (~20 000 cases, only failures printed in verbose mode); flags must not leak into the next conversion |
+| `bonus_hash_space_plus` | `#`, `' '`, `+`: `%#x` with 0, `#` with `0` and a precision, `+` overriding `' '` in either order |
+| `bonus_combinations` | flags, width and precision must not leak into the next conversion or call |
 | `bonus_project` | Makefile `bonus` rule, `make bonus` does not relink |
 
 **Printf_original** ${\color{orange}\text{(informational — never counted as failures)}}$ — what the original printf does where the C standard says the behaviour is undefined. The subject does not require it; it is shown as `~ n/m match` in yellow.

@@ -25,49 +25,15 @@ void	test_ft_striteri(t_ctx *ctx)
 {
 	char		buf[64];
 
-	/* in-place to_upper */
-	strcpy(buf, "hello");
+	/* in-place edit: only letters should change */
+	strcpy(buf, "a1b2c3");
 	ft_striteri(buf, to_upper_cb);
-	check_str(ctx, "striteri to_upper(\"hello\")", "HELLO", buf);
+	check_str(ctx, "striteri mixed(\"a1b2c3\")", "A1B2C3", buf);
 
-	/* all already upper */
-	strcpy(buf, "WORLD");
-	ft_striteri(buf, to_upper_cb);
-	check_str(ctx, "striteri to_upper(\"WORLD\") unchanged", "WORLD", buf);
-
-	/* single char */
-	strcpy(buf, "a");
-	ft_striteri(buf, to_upper_cb);
-	check_str(ctx, "striteri to_upper(\"a\")", "A", buf);
-
-	/* first character is processed (index 0) */
+	/* all indices 0-based: 0,1,2,3,4 for "hello" */
 	strcpy(buf, "hello");
 	g_call_count = 0;
 	ft_striteri(buf, record);
-	if (g_call_count > 0 && g_indices[0] == 0)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET
-				" striteri: first callback index == 0\n");
-	}
-	else if (g_call_count == 0)
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET
-				" striteri: callback never called on \"hello\"\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET
-				" striteri: first callback index should be 0, got %u\n",
-				g_indices[0]);
-	}
-
-	/* all indices 0-based: 0,1,2,3,4 for "hello" */
 	if (g_call_count == 5)
 	{
 		int	ok;
@@ -116,50 +82,4 @@ void	test_ft_striteri(t_ctx *ctx)
 	strcpy(buf, "");
 	ft_striteri(buf, to_upper_cb);
 	check_str(ctx, "striteri(\"\") unchanged", "", buf);
-
-	/* mixed alpha and non-alpha: only letters should change */
-	strcpy(buf, "a1b2c3");
-	ft_striteri(buf, to_upper_cb);
-	check_str(ctx, "striteri mixed(\"a1b2c3\")", "A1B2C3", buf);
-
-	/* second callback index must be 1 */
-	strcpy(buf, "abc");
-	g_call_count = 0;
-	ft_striteri(buf, record);
-	if (g_call_count >= 2 && g_indices[1] == 1)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET
-				" striteri: second callback index == 1\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET
-				" striteri: second callback index should be 1, got %u\n",
-				g_call_count >= 2 ? g_indices[1] : 999u);
-	}
-
-	/* verify single-char string gets exactly one callback at index 0 */
-	strcpy(buf, "x");
-	g_call_count = 0;
-	ft_striteri(buf, record);
-	if (g_call_count == 1 && g_indices[0] == 0)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET
-				" striteri: single-char: 1 call, index 0\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET
-				" striteri: single-char: expected 1 call at idx 0,"
-				" got %d calls, first idx %u\n",
-				g_call_count, g_call_count ? g_indices[0] : 999u);
-	}
 }

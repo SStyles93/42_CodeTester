@@ -43,7 +43,6 @@ typedef struct s_pfcase
 
 extern char	g_pf_exp[PF_BUF_SIZE];
 extern char	g_pf_got[PF_BUF_SIZE];
-extern int	g_pf_quiet;
 
 /* Redirect fd 1 into a temp file / restore it and read what was written. */
 int		pf_capture_begin(t_pfcap *cap);

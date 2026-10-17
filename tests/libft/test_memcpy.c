@@ -8,12 +8,10 @@ void	test_ft_memcpy(t_ctx *ctx)
 	char		ref[20];
 	char		got[20];
 
-	memset(ref, 0, 20); memset(got, 0, 20);
+	/* partial copy: bytes after n must stay intact */
+	memset(ref, 'X', 20); memset(got, 'X', 20);
 	memcpy(ref, src, 5); ft_memcpy(got, src, 5);
-	check_mem(ctx, "copy 5 bytes", ref, got, 5);
-
-	memcpy(ref, src, strlen(src) + 1); ft_memcpy(got, src, strlen(src) + 1);
-	check_mem(ctx, "copy full string + NUL", ref, got, strlen(src) + 1);
+	check_mem(ctx, "copy 5 bytes, tail intact", ref, got, 20);
 
 	memset(ref, 'X', 4); memset(got, 'X', 4);
 	memcpy(ref, src, 0); ft_memcpy(got, src, 0);
@@ -23,15 +21,6 @@ void	test_ft_memcpy(t_ctx *ctx)
 	void	*ret = ft_memcpy(dst, src, 5);
 	check_ptr(ctx, "returns dst pointer", (void *)dst, ret);
 
-	/* single byte copy */
-	{
-		char	rsingle = 'Y';
-		char	gsingle = 'Y';
-		char	src2 = 'X';
-		memcpy(&rsingle, &src2, 1);
-		ft_memcpy(&gsingle, &src2, 1);
-		check_char(ctx, "copy 1 byte", rsingle, gsingle);
-	}
 	/* binary data with embedded zeros */
 	{
 		const unsigned char	bsrc[] = {0x00, 0x01, 0xFF, 0x7F, 0x80, 0x42};

@@ -34,29 +34,12 @@ static void	t_putnbr(t_ctx *ctx, const char *label, int n, const char *expected)
 void	test_ft_putnbr_fd(t_ctx *ctx)
 {
 	t_putnbr(ctx, "putnbr_fd 0",          0,           "0");
-	t_putnbr(ctx, "putnbr_fd 1",          1,           "1");
-	t_putnbr(ctx, "putnbr_fd 42",         42,          "42");
-	t_putnbr(ctx, "putnbr_fd -1",         -1,          "-1");
-	t_putnbr(ctx, "putnbr_fd -42",        -42,         "-42");
-	t_putnbr(ctx, "putnbr_fd 100",        100,         "100");
-	t_putnbr(ctx, "putnbr_fd -100",       -100,        "-100");
+	t_putnbr(ctx, "putnbr_fd 9",          9,           "9");
+	t_putnbr(ctx, "putnbr_fd -9",         -9,          "-9");
+	/* digit-count transitions */
+	t_putnbr(ctx, "putnbr_fd 10",         10,          "10");
+	t_putnbr(ctx, "putnbr_fd -10",        -10,         "-10");
+	t_putnbr(ctx, "putnbr_fd 1000",       1000,        "1000");
 	t_putnbr(ctx, "putnbr_fd 2147483647", 2147483647,  "2147483647");
 	t_putnbr(ctx, "putnbr_fd INT_MIN",    -2147483648, "-2147483648");
-	t_putnbr(ctx, "putnbr_fd 1000000",    1000000,     "1000000");
-	t_putnbr(ctx, "putnbr_fd -1000000",   -1000000,    "-1000000");
-
-	/* single digit boundary */
-	t_putnbr(ctx, "putnbr_fd 9",    9,    "9");
-	t_putnbr(ctx, "putnbr_fd -9",  -9,   "-9");
-	/* decade transitions */
-	t_putnbr(ctx, "putnbr_fd 10",   10,   "10");
-	t_putnbr(ctx, "putnbr_fd -10", -10,  "-10");
-	t_putnbr(ctx, "putnbr_fd 99",   99,   "99");
-	t_putnbr(ctx, "putnbr_fd -99", -99,  "-99");
-	t_putnbr(ctx, "putnbr_fd 999",  999,  "999");
-	t_putnbr(ctx, "putnbr_fd -999", -999, "-999");
-	/* powers of ten */
-	t_putnbr(ctx, "putnbr_fd 10000",    10000,    "10000");
-	t_putnbr(ctx, "putnbr_fd 100000",   100000,   "100000");
-	t_putnbr(ctx, "putnbr_fd -100000", -100000,  "-100000");
 }

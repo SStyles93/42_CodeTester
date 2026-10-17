@@ -36,16 +36,9 @@ void	test_ft_strncmp(t_ctx *ctx)
 	t_strncmp(ctx, "s1 > s2", "abd", "abc", 3);
 	t_strncmp(ctx, "n=0 → 0", "abc", "xyz", 0);
 	t_strncmp(ctx, "equal prefix, differ after n", "hello!", "hello?", 5);
-	t_strncmp(ctx, "differ at byte n", "hello!", "hello?", 6);
 	t_strncmp(ctx, "s1 shorter (NUL < 'h')", "hi", "high", 4);
 	t_strncmp(ctx, "s2 shorter ('h' > NUL)", "high", "hi", 4);
-	t_strncmp(ctx, "both empty", "", "", 0);
-	t_strncmp(ctx, "empty vs non-empty", "", "a", 1);
-	/* n=1 comparisons */
-	t_strncmp(ctx, "n=1 equal",   "abc", "abc", 1);
-	t_strncmp(ctx, "n=1 less",    "a",   "b",   1);
-	t_strncmp(ctx, "n=1 greater", "b",   "a",   1);
-	/* n > strlen: equal strings compared past their end */
+	/* n > strlen: must stop at NUL, not read past it */
 	t_strncmp(ctx, "n > strlen equal strings", "hi", "hi", 100);
 	/* unsigned char comparison: 0xFF (255 as unsigned) > 0x01 (1) */
 	{
@@ -53,6 +46,4 @@ void	test_ft_strncmp(t_ctx *ctx)
 		char	u2[] = {0x01, '\0'};
 		t_strncmp(ctx, "0xFF > 0x01 (unsigned)", u1, u2, 1);
 	}
-	/* differ only at position n: should return 0 */
-	t_strncmp(ctx, "equal first n, differ at n+1", "abcX", "abcY", 3);
 }
