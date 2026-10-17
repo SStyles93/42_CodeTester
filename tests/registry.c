@@ -5,9 +5,11 @@ t_project	*get_libft_project(void);
 #endif
 #ifdef WITH_PRINTF
 t_project	*get_printf_project(void);
+t_project	*get_printf_bonus_project(void);
+t_project	*get_printf_original_project(void);
 #endif
 
-static t_project	*g_projects[4];
+static t_project	*g_projects[8];
 
 t_project	**get_all_projects(int *count)
 {
@@ -19,6 +21,8 @@ t_project	**get_all_projects(int *count)
 #endif
 #ifdef WITH_PRINTF
 	g_projects[i++] = get_printf_project();
+	g_projects[i++] = get_printf_bonus_project();
+	g_projects[i++] = get_printf_original_project();
 #endif
 	*count = i;
 	return (g_projects);

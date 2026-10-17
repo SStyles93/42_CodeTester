@@ -8,7 +8,7 @@ An interactive C tester for 42 projects.
 | **Library** | **State** | **Grade** |
 |---|---|---|
 | **Libft** | Full ${\color{lightgreen}\text{(including linked-list functions)}}$ | ${\color{lightgreen}\text{100/100}}$ |  
-**Printf** | ${\color{orange}\text{In progress}}$ | ${\color{red}\text{N}}$ |
+| **Printf** | Full ${\color{lightgreen}\text{(mandatory + bonus + original printf behaviour)}}$ | ${\color{red}\text{N}}$ |
 
 
 ## Features
@@ -21,6 +21,10 @@ An interactive C tester for 42 projects.
 - **Valgrind** — `make valgrind` runs under Valgrind with full leak checking ${\color{orange}\text{(Linux only)}}$
 - **Cross-platform** — builds on Linux, macOS, and Windows (native or WSL/MinGW)
 - **Auto-detection** — the Makefile finds sibling project directories automatically (case-insensitive: `libft`, `Libft`, `LIBFT`, etc.) and only compiles the suites for projects that are present
+- **Missing-function detection** — functions are declared weak, so an unimplemented one is reported as `MISSING` instead of breaking the build
+- **Compared against the real printf** — every `ft_printf` case runs `snprintf` with the same arguments and compares the bytes written to stdout and the return value
+- **Subject checks** — Makefile rules, relinking, library/header names, forbidden external functions and the README format required by the subject
+- **Informational categories** — behaviour the subject does not require (e.g. what the original printf does with `%k`) is reported without counting as a failure
 
 ## Requirements
 
@@ -32,17 +36,20 @@ An interactive C tester for 42 projects.
 | `valgrind` | Optional — ${\color{orange}\text{Linux only}}$, for `make valgrind` |
 | ASan-capable compiler | Optional — ${\color{orange}\text{Linux and macOS}}$, for `make asan` |
 
-The tester auto-detects your project directories as siblings of this repo (e.g. `../libft`). It builds the relevant library (e.g. `libft.a`) automatically before linking.
+The tester auto-detects your project directories as siblings of this repo (e.g. `../libft`, `../printf`). It builds the relevant library (`libft.a`, `libftprintf.a`) automatically before linking, by running your project's own Makefile.
 
 ## Building
 
-Your project directory must be a **sibling** of `CodeTester` — the Makefile finds it automatically:
+Your project directories must be **siblings** of `CodeTester` — the Makefile finds them automatically. Any combination works (only libft, only printf, or both):
 
 ```
 parent/
 ├── CodeTester/
-└── libft/          ← auto-detected
+├── libft/          ← auto-detected (libft.a)
+└── printf/         ← auto-detected (libftprintf.a)
 ```
+
+> **Printf:** `libftprintf.a` must contain real object files. If your printf uses libft, copy `libft.a` and add your objects to it (`cp $(LIBFT) $(NAME)` then `ar rcs $(NAME) $(OBJS)`). Passing `libft.a` itself to `ar` stores it as a nested archive, which the linker cannot use.
 
 ### ${\color{lightgreen}\text{macOS}}$ — fully supported
 
@@ -88,8 +95,12 @@ The Makefile detects Windows and produces `tester.exe`. ${\color{red}\text{make 
 ```sh
 make              # build ./tester (only suites for detected projects)
 ./tester          # interactive menu (when stdin is a terminal)
-./tester all      # run every test suite non-interactively
-./tester ft_split # run a single named suite
+./tester all      # run every suite of every detected project
+./tester libft    # run one whole project (case-insensitive name)
+./tester printf   # run every printf category (mandatory, bonus, original)
+./tester printf_bonus  # run a single category
+./tester ft_split # run a single named suite (searched in every project)
+./tester -v printf_s   # verbose: each check, with expected/got on failure
 ./tester -v all   # verbose output — shows each individual check
 ./tester -t 5 all # set timeout to 5 s per suite (default: 10 s)
 make asan         # build with AddressSanitizer + UBSan, then run all
@@ -98,6 +109,8 @@ make re           # clean rebuild
 ```
 
 ## Test suites
+
+### Libft
 
 All 43 standard Libft functions have a dedicated suite, plus a `memory` suite that stress-tests malloc-failure handling:
 
@@ -112,6 +125,43 @@ All 43 standard Libft functions have a dedicated suite, plus a `memory` suite th
 | File descriptors | `ft_putchar_fd`, `ft_putstr_fd`, `ft_putendl_fd`, `ft_putnbr_fd` |
 | Linked list (bonus) | `ft_lstnew`, `ft_lstadd_front`, `ft_lstadd_back`, `ft_lstsize`, `ft_lstlast`, `ft_lstdelone`, `ft_lstclear`, `ft_lstiter`, `ft_lstmap` |
 | Memory checks | `memory` (malloc-failure injection, Linux) |
+
+### ft_printf
+
+Every case calls the real `snprintf` and `ft_printf` with the same arguments, captures what `ft_printf` writes to fd 1, and compares the bytes and the return value. The reference is therefore the libc of the machine running the tests (glibc on Linux/WSL, libSystem on macOS): `(null)`, `(nil)` and `0x0` are expected where the host printf prints them.
+
+The suites are split into three categories, following the subject:
+
+**Printf_mandatory** — the conversions `cspdiuxX%` without any flag, and the subject requirements
+
+| Suite | What it covers |
+|---|---|
+| `ft_printf` | plain text, empty format, every conversion in one call, 20 arguments, a 20 000-char format |
+| `printf_c` | `'\0'` (written and counted), values > 127 and negative, all 256 byte values |
+| `printf_s` | empty strings, UTF-8, `NULL`, a 100 000-char argument |
+| `printf_p` | `NULL`, `1`, `ULONG_MAX`, `LONG_MIN`, real stack/heap addresses |
+| `printf_di` / `printf_u` / `printf_x` | limits, negatives reinterpreted as unsigned, every power of 10 / 16 |
+| `printf_percent` | `%%` in every position |
+| `printf_behavior` | no buffering (output interleaved in order with raw `write()`), `-1` when `write` fails (stdout closed, read-only, broken pipe, `/dev/full`), recovery after an error, no state kept between calls, no leaks and malloc-failure handling ${\color{orange}\text{(Linux)}}$ |
+| `printf_project` | `libftprintf.a` at the root, `ft_printf.h` with the prototype, Makefile `NAME` / `all` / `clean` / `fclean` / `re`, `ar` used and not `libtool`, `-Wall -Wextra -Werror`, no relink, only `malloc` / `free` / `write` as external functions (read with `nm`), README first line and sections |
+
+**Printf_bonus** — flags `-0.`, minimum field width and `# +`
+
+| Suite | What it covers |
+|---|---|
+| `bonus_minus_zero_dot` | width, `-`, `0`, `.`: `-` overriding `0`, precision disabling `0`, `%.0d` with 0, `NULL` with a precision, widths up to 100 000 |
+| `bonus_hash_space_plus` | `#`, `' '`, `+`: `%#x` with 0, `+` overriding `' '`, repeated and reordered flags |
+| `bonus_combinations` | every valid combination of flags × width × precision per conversion against edge values (~20 000 cases, only failures printed in verbose mode); flags must not leak into the next conversion |
+| `bonus_project` | Makefile `bonus` rule, `make bonus` does not relink |
+
+**Printf_original** ${\color{orange}\text{(informational — never counted as failures)}}$ — what the original printf does where the C standard says the behaviour is undefined. The subject does not require it; it is shown as `~ n/m match` in yellow.
+
+| Suite | What it covers |
+|---|---|
+| `original_conversions` | incomplete or unknown conversions without flags: `"%"`, `"abc%"`, `%k`, `ft_printf(NULL)` |
+| `original_flags` | the same with flags (`%5%`, `%-5k`) and flags that do not apply to the conversion (`%#d`, `%+u`, `%05s`, `%.3c`, `%+p`…) |
+
+Cases that may crash (`NULL` format, trailing `%`) run in their own process, so a crash only fails that case.
 
 ## Project structure
 
@@ -132,8 +182,15 @@ CodeTester/
 │   │   ├── registry.c  # Registers all Libft suites
 │   │   └── test_<name>.c  # One file per Libft function
 │   └── printf/
-│       ├── registry.c  # Registers all ft_printf suites (WIP)
-│       └── test_<name>.c  # One file per ft_printf specifier/feature
+│       ├── registry.c  # Registers the Printf_mandatory / _bonus / _original categories
+│       ├── pf_tester.h # PF / PF_L macros: compare ft_printf with snprintf
+│       ├── pf_utils.c  # stdout capture into a temp file, result reporting
+│       ├── test_ft_printf.c, test_pf_<c|s|p|di|u|x|percent>.c  # mandatory conversions
+│       ├── test_pf_behavior.c   # buffering, write errors, memory
+│       ├── test_pf_project.c    # subject requirements (Makefile, nm, README...)
+│       ├── test_pf_minus_zero_dot.c, test_pf_hash_space_plus.c,
+│       │   test_pf_combinations.c  # bonus flags
+│       └── test_pf_original.c   # undefined behaviour vs the original printf
 └── Makefile
 ```
 
@@ -170,11 +227,23 @@ Available helpers (declared in `include/tester.h`):
 
 No rebuild configuration needed — just edit the `.c` file and `make`.
 
+#### ft_printf cases
+
+In `tests/printf/`, use the `PF` macro from `pf_tester.h` instead of the `check_*` helpers. It runs `snprintf` and `ft_printf` with the same arguments and compares the output and return value; the label is the call's source text:
+
+```c
+// tests/printf/test_pf_x.c
+PF(ctx, "%x", 255u);
+PF(ctx, "[%-8.3d]", -42);
+```
+
+For a format built at runtime, use `PF_L(ctx, label, format, args...)` to give it a readable label. Put a case in the category it belongs to: no flags → mandatory, flags → bonus, undefined behaviour → original.
+
 ---
 
 ### Adding a new suite to an existing project
 
-This takes three steps, shown here for adding `ft_foo` to the Libft project:
+This takes four steps, shown here for adding `ft_foo` to the Libft project:
 
 **1. Create `tests/libft/test_foo.c`**
 
@@ -257,7 +326,7 @@ void    test_ft_foo(t_ctx *ctx)
 }
 ```
 
-`registry.c` must define a `get_<project>_project()` function. Suite entries take four fields — name, test function, function pointer for presence-checking, and the check flag:
+`registry.c` must define a `get_<project>_project()` function. Suite entries take four fields — name, test function, function pointer for presence-checking, and the check flag (`NULL, 0` for a suite that does not test one function, like `printf_project`). A project takes four fields — name, suites, suite count, and the `informational` flag (`1`: failures are shown as differences and never counted, like `Printf_original`):
 
 ```c
 #include "../../include/tester.h"
@@ -272,7 +341,8 @@ static t_suite g_suites[] = {
 static t_project g_project = {
     "<ProjectName>",
     g_suites,
-    sizeof(g_suites) / sizeof(g_suites[0])
+    sizeof(g_suites) / sizeof(g_suites[0]),
+    0
 };
 
 t_project   *get_<project>_project(void)
@@ -280,6 +350,8 @@ t_project   *get_<project>_project(void)
     return (&g_project);
 }
 ```
+
+A project can be split into several categories by defining one `t_project` per category, as `tests/printf/registry.c` does. Name them `<Project>_<category>`: `./tester <project>` then runs all of them.
 
 **3. Register the project in `tests/registry.c`**
 
@@ -297,3 +369,8 @@ t_project   *get_myproject_project(void);
 **4. Wire it up in the Makefile**
 
 Add a sibling-directory detection block and a conditional `SRCS +=` block following the same pattern as the existing `LIBFT_DIR` / `PRINTF_DIR` blocks.
+
+Because the tester only references your functions **weakly**, the linker does not pull them out of a static archive by itself. Force them in, as the existing blocks do:
+
+- `-Wl,--whole-archive lib.a -Wl,--no-whole-archive` (`-Wl,-all_load` on macOS) keeps every object of the archive (libft block);
+- `-Wl,-u,ft_foo lib.a` (`-Wl,-u,_ft_foo` on macOS) pulls in only `ft_foo` and what it needs (printf block). Use this one when the archive contains another project's objects (e.g. `libftprintf.a` contains libft), otherwise the symbols are defined twice.

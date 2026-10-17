@@ -39,6 +39,7 @@ typedef struct s_project
 	const char	*name;
 	t_suite		*suites;
 	int			suite_count;
+	int			informational;	/* results shown, but never counted as fails */
 }	t_project;
 
 /* Assertion helpers (src/utils.c) */
@@ -64,7 +65,7 @@ extern int	g_test_timeout;
 void	run_isolated(t_ctx *ctx, const char *label,
 			void (*fn)(t_ctx *, const void *), const void *arg);
 
-void	run_suite(t_suite *suite, int verbose);
+void	run_suite(t_project *project, t_suite *suite, int verbose);
 void	run_project_all(t_project *project, int verbose);
 void	run_suite_by_name(t_project *project, const char *name, int verbose);
 

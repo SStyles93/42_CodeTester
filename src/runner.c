@@ -91,7 +91,11 @@ static void	call_suite(t_ctx *ctx, const void *arg)
 	((const t_suite *)arg)->run(ctx);
 }
 
-static void	run_one(t_suite *suite, t_ctx *ctx)
+/*
+** In an informational project a failed check only means "differs from the
+** reference": it is shown in yellow and reported as such, never as a fail.
+*/
+static void	run_one(t_suite *suite, t_ctx *ctx, int informational)
 {
 	int	total;
 
@@ -111,19 +115,22 @@ static void	run_one(t_suite *suite, t_ctx *ctx)
 	if (ctx->fail == 0)
 		printf("  " GREEN "✓" RESET " %-22s " GREEN "%d/%d" RESET "\n",
 			suite->name, ctx->pass, total);
+	else if (informational)
+		printf("  " YELLOW "~" RESET " %-22s " YELLOW "%d/%d match" RESET
+			DIM " (informational)" RESET "\n", suite->name, ctx->pass, total);
 	else
 		printf("  " RED "✗" RESET " %-22s " RED "%d/%d" RESET "\n",
 			suite->name, ctx->pass, total);
 }
 
-void	run_suite(t_suite *suite, int verbose)
+void	run_suite(t_project *project, t_suite *suite, int verbose)
 {
 	t_ctx	ctx;
 
 	ctx.pass = 0;
 	ctx.fail = 0;
 	ctx.verbose = verbose;
-	run_one(suite, &ctx);
+	run_one(suite, &ctx, project->informational);
 }
 
 void	run_project_all(t_project *project, int verbose)
@@ -143,14 +150,19 @@ void	run_project_all(t_project *project, int verbose)
 		ctx.pass = 0;
 		ctx.fail = 0;
 		ctx.verbose = verbose;
-		run_one(&project->suites[i], &ctx);
+		run_one(&project->suites[i], &ctx, project->informational);
 		total_pass += ctx.pass;
 		total_fail += ctx.fail;
 		i++;
 	}
-	printf("\n" BOLD "Summary: " RESET GREEN "%d passed" RESET
-		", " RED "%d failed" RESET " / %d total\n",
-		total_pass, total_fail, total_pass + total_fail);
+	if (project->informational)
+		printf("\n" BOLD "Summary (informational, not counted): " RESET
+			GREEN "%d match" RESET ", " YELLOW "%d differ" RESET
+			" / %d total\n", total_pass, total_fail, total_pass + total_fail);
+	else
+		printf("\n" BOLD "Summary: " RESET GREEN "%d passed" RESET
+			", " RED "%d failed" RESET " / %d total\n",
+			total_pass, total_fail, total_pass + total_fail);
 }
 
 void	run_suite_by_name(t_project *project, const char *name, int verbose)
@@ -162,7 +174,7 @@ void	run_suite_by_name(t_project *project, const char *name, int verbose)
 	{
 		if (strcmp(project->suites[i].name, name) == 0)
 		{
-			run_suite(&project->suites[i], verbose);
+			run_suite(project, &project->suites[i], verbose);
 			return ;
 		}
 		i++;

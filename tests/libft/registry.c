@@ -96,7 +96,8 @@ static t_suite	g_suites[] = {
 static t_project	g_project = {
 	"Libft",
 	g_suites,
-	sizeof(g_suites) / sizeof(g_suites[0])
+	sizeof(g_suites) / sizeof(g_suites[0]),
+	0
 };
 
 t_project	*get_libft_project(void)

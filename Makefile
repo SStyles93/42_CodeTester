@@ -111,15 +111,36 @@ endif
 
 ifneq ($(PRINTF_DIR),)
     PRINTF_A     = $(PRINTF_DIR)/libftprintf.a
-    CFLAGS       += -DWITH_PRINTF
+    CFLAGS       += -DWITH_PRINTF -DPRINTF_PATH='"$(abspath $(PRINTF_DIR))"'
     INCLUDES     += -I $(PRINTF_DIR)
-    LINK_LIBS    += $(PRINTF_A)
+    # ft_printf is only referenced weakly, which does not pull it out of the
+    # archive: force it with -u. Not --whole-archive, because libftprintf.a
+    # also contains libft and would clash with ../libft/libft.a.
+    ifeq ($(UNAME_S),Darwin)
+        LINK_LIBS += -Wl,-u,_ft_printf $(PRINTF_A)
+    else
+        LINK_LIBS += -Wl,-u,ft_printf $(PRINTF_A)
+    endif
     LINK_DEPS    += $(PRINTF_A)
     PRINTF_FCLEAN = @$(MAKE) --no-print-directory -C $(PRINTF_DIR) fclean
     
     # TEST TO ADD HERE IF NECESSARY
     SRCS         += tests/printf/registry.c \
-                    tests/printf/test_ft_printf.c
+                    tests/printf/pf_utils.c \
+                    tests/printf/test_ft_printf.c \
+                    tests/printf/test_pf_c.c \
+                    tests/printf/test_pf_s.c \
+                    tests/printf/test_pf_p.c \
+                    tests/printf/test_pf_di.c \
+                    tests/printf/test_pf_u.c \
+                    tests/printf/test_pf_x.c \
+                    tests/printf/test_pf_percent.c \
+                    tests/printf/test_pf_minus_zero_dot.c \
+                    tests/printf/test_pf_hash_space_plus.c \
+                    tests/printf/test_pf_combinations.c \
+                    tests/printf/test_pf_behavior.c \
+                    tests/printf/test_pf_original.c \
+                    tests/printf/test_pf_project.c
 else
     PRINTF_FCLEAN = @true
 endif
@@ -132,7 +153,11 @@ endif
 #     OTHER_A     = $(OTHER_DIR)/libname.a
 #     CFLAGS       += -DWITH_OTHER
 #     INCLUDES     += -I $(OTHER_DIR)
-#     LINK_LIBS    += $(OTHER_A)
+#     ifeq ($(UNAME_S),Darwin)
+#       LINK_LIBS += -Wl,-all_load $(OTHER_DIR)
+#     else
+#       LINK_LIBS += -Wl,--whole-archive $(OTHER_DIR) -Wl,--no-whole-archive
+#     endif
 #     LINK_DEPS    += $(OTHER_A)
 #     OTHER_FCLEAN = @$(MAKE) --no-print-directory -C $(OTHER_DIR) fclean
     

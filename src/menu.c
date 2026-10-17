@@ -265,7 +265,8 @@ void	launch_menu(t_project **projects, int count)
 			if (suite_idx == -1)
 				run_project_all(projects[proj_idx], verbose);
 			else
-				run_suite(&projects[proj_idx]->suites[suite_idx], verbose);
+				run_suite(projects[proj_idx],
+					&projects[proj_idx]->suites[suite_idx], verbose);
 			printf("\n  " DIM "Press any key to continue..." RESET "\n");
 			enable_raw();
 			read_key();
