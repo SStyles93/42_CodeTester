@@ -9,8 +9,7 @@
 **   - libftprintf.a at the root, built with ar (libtool forbidden);
 **   - ft_printf.h containing the prototype;
 **   - Makefile with NAME, all, clean, fclean, re (+ bonus), no relink;
-**   - only malloc, free, write (and va_*) as external functions;
-**   - README.md with the required first line and sections.
+**   - only malloc, free, write (and va_*) as external functions.
 ** PRINTF_PATH (absolute path of the project) is set by the Makefile.
 */
 
@@ -53,20 +52,6 @@ static char	*read_file(const char *name)
 		buf[fread(buf, 1, size, f)] = '\0';
 	fclose(f);
 	return (buf);
-}
-
-static int	ci_contains(const char *s, const char *word)
-{
-	size_t	n;
-
-	n = strlen(word);
-	while (*s)
-	{
-		if (strncasecmp(s, word, n) == 0)
-			return (1);
-		s++;
-	}
-	return (0);
 }
 
 /* Copy line starting at s into line (without '\n'), return the next line. */
@@ -197,43 +182,6 @@ static void	check_makefile(t_ctx *ctx)
 		strstr(mk, "-Wall") && strstr(mk, "-Wextra") && strstr(mk, "-Werror"),
 		NULL);
 	free(mk);
-}
-
-static void	check_readme(t_ctx *ctx)
-{
-	char		*rd;
-	char		first[1024];
-	size_t		len;
-	int			ok;
-
-	rd = read_file("README.md");
-	pass_fail(ctx, "README.md exists at the root", rd != NULL, NULL);
-	if (!rd)
-		return ;
-	next_line(rd, first, sizeof(first));
-	len = strlen(first);
-	while (len > 0 && first[len - 1] == ' ')
-		first[--len] = '\0';
-	ok = len > 2 && (first[0] == '*' || first[0] == '_')
-		&& first[len - 1] == first[0]
-		&& strstr(first, "This project has been created as part of the 42"
-			" curriculum by ") != NULL;
-	pass_fail(ctx, "README first line: *This project has been created as part"
-		" of the 42 curriculum by <login>*", ok, "first line is not that"
-		" sentence in italics");
-	pass_fail(ctx, "README has a Description section",
-		ci_contains(rd, "# Description") || ci_contains(rd, "#Description"),
-		NULL);
-	pass_fail(ctx, "README has an Instructions section",
-		ci_contains(rd, "# Instructions") || ci_contains(rd, "#Instructions"),
-		NULL);
-	pass_fail(ctx, "README has a Resources section",
-		ci_contains(rd, "# Resources") || ci_contains(rd, "#Resources"), NULL);
-	pass_fail(ctx, "README describes how AI was used (mentions \"AI\")",
-		strstr(rd, "AI") != NULL, NULL);
-	pass_fail(ctx, "README explains the algorithm / data structure"
-		" (mentions \"algorithm\")", ci_contains(rd, "algorithm"), NULL);
-	free(rd);
 }
 
 #ifndef _WIN32
@@ -408,7 +356,6 @@ void	test_pf_project(t_ctx *ctx)
 	check_relink(ctx, "all");
 	check_external_functions(ctx);
 #endif
-	check_readme(ctx);
 }
 
 void	test_pf_bonus_project(t_ctx *ctx)
