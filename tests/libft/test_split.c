@@ -115,4 +115,49 @@ void	test_ft_split(t_ctx *ctx)
 
 	/* multiple consecutive separators */
 	check_split(ctx, "split(\"one   two\",' ')", ft_split("one   two", ' '), exp2, 2);
+
+	/*
+	** '\0' as separator: '\0' is the string terminator, so it is never
+	** encountered inside a valid C string. No separator is found and the
+	** whole string is returned as a single word.
+	** Buggy inner scan loops written as:
+	**   while (s[i] != c)          <- no null-guard
+	** exit at the NUL terminator (since '\0' == c), but then the outer
+	** loop increments i past the end of the string and reads garbage
+	** memory, causing a segfault.
+	** The correct form is: while (s[i] && s[i] != c)
+	*/
+	{
+		const char	*exp_nul[] = {"hello"};
+
+		check_split(ctx, "split(\"hello\",'\\0') nul-sep → single word",
+			ft_split("hello", '\0'), exp_nul, 1);
+	}
+	{
+		const char	*exp_nul2[] = {"a b c"};
+
+		check_split(ctx, "split(\"a b c\",'\\0') nul-sep → single word",
+			ft_split("a b c", '\0'), exp_nul2, 1);
+	}
+	check_split_empty(ctx, "split(\"\", '\\0') nul-sep", ft_split("", '\0'));
+
+	/* NULL string → must return NULL without crashing */
+	{
+		char	**r;
+
+		r = ft_split(NULL, ' ');
+		if (r == NULL)
+		{
+			ctx->pass++;
+			if (ctx->verbose)
+				printf("    " GREEN "✓" RESET " split(NULL,' ') → NULL\n");
+		}
+		else
+		{
+			ctx->fail++;
+			if (ctx->verbose)
+				printf("    " RED "✗" RESET " split(NULL,' ') → expected NULL\n");
+			free_split(r);
+		}
+	}
 }
