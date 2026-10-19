@@ -1,4 +1,5 @@
 #include "pf_tester.h"
+#include <string.h>
 
 #define PF_SHOW_MAX 120
 
@@ -77,6 +78,76 @@ static int	first_diff(const char *a, int alen, const char *b, int blen)
 	while (i < alen && i < blen && a[i] == b[i])
 		i++;
 	return (i);
+}
+
+/*
+** Like pf_report, but also accepts alt_exp as a valid output string.
+** Intended for specifier/value combos where two platforms produce different
+** but equally correct text (e.g. "%p" with NULL: "(nil)" vs "0x0").
+** The host snprintf result is always the primary expected; alt_exp covers
+** the other platform.  A "[platform alt]" tag is shown in verbose mode.
+*/
+void	pf_report_alt(t_ctx *ctx, const char *label,
+		const t_pfcase *c, const char *alt_exp)
+{
+	int	exp_len;
+	int	alt_len;
+	int	ok;
+	int	ok_alt;
+
+	exp_len = c->exp_ret;
+	if (exp_len >= PF_BUF_SIZE)
+		exp_len = PF_BUF_SIZE - 1;
+	alt_len = alt_exp ? (int)strlen(alt_exp) : -1;
+	if (!c->cap_ok)
+		ok = 0;
+	else if (c->exp_ret < 0)
+		ok = (c->got_ret == c->exp_ret);
+	else
+		ok = (c->got_ret == c->exp_ret && c->got_len == exp_len
+				&& memcmp(g_pf_exp, g_pf_got, exp_len) == 0);
+	ok_alt = (!ok && alt_exp && c->got_ret == alt_len && c->got_len == alt_len
+			&& memcmp(alt_exp, g_pf_got, alt_len) == 0);
+	if (ok || ok_alt)
+		ctx->pass++;
+	else
+		ctx->fail++;
+	if (!ctx->verbose)
+		return ;
+	if (ok || ok_alt)
+	{
+		printf("    " GREEN "✓" RESET " %s → ", label);
+		pf_print_escaped(g_pf_got, c->got_len);
+		printf(" (%d)", c->got_ret);
+		if (ok_alt)
+			printf(" " DIM "[platform alt]" RESET);
+		printf("\n");
+		return ;
+	}
+	printf("    " RED "✗" RESET " %s\n", label);
+	if (!c->cap_ok)
+	{
+		printf("        could not capture stdout\n");
+		return ;
+	}
+	printf("        expected: ");
+	if (c->exp_ret < 0)
+		printf("(error)");
+	else
+	{
+		pf_print_escaped(g_pf_exp, exp_len);
+		if (alt_exp)
+		{
+			printf(" or ");
+			pf_print_escaped(alt_exp, alt_len);
+		}
+	}
+	printf(" return %d\n        got:      ", c->exp_ret);
+	pf_print_escaped(g_pf_got, c->got_len);
+	printf(" return %d\n", c->got_ret);
+	if (c->exp_ret >= 0)
+		printf(DIM "        first difference at byte %d" RESET "\n",
+			first_diff(g_pf_exp, exp_len, g_pf_got, c->got_len));
 }
 
 void	pf_report(t_ctx *ctx, const char *label, const t_pfcase *c)

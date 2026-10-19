@@ -4,8 +4,8 @@ void	test_pf_p(t_ctx *ctx)
 {
 	int		local;
 
-	/* NULL ("(nil)" on Linux, "0x0" on macOS) */
-	PF(ctx, "%p", NULL);
+	/* NULL: Linux/glibc prints "(nil)", macOS prints "0x0" — both accepted */
+	PF_L_ALT(ctx, "\"%p\", NULL", "(nil)", "%p", NULL);
 
 	PF(ctx, "%p", (void *)1);
 	PF(ctx, "%p", (void *)15);
