@@ -1,5 +1,7 @@
 *This repository has been created to test the 42 School projects.*
 
+> For bugs, missing edge cases, or support: [contact me](mailto:samuel.styles93@gmail.com)
+
 # CodeTester
 
 An interactive C tester for 42 projects.  
