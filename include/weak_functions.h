@@ -57,4 +57,7 @@ __attribute__((weak)) t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (
 /* ── ft_printf ── */
 __attribute__((weak)) int			ft_printf(const char *format, ...);
 
+/* ── GNL ── */
+__attribute__((weak)) char			*get_next_line(int fd);
+
 #endif

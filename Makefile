@@ -22,8 +22,9 @@ UNAME_S     := $(shell uname -s 2>/dev/null)
 # ── auto-detect student project directories ──────────────────────────────────
 LIBFT_DIR   := $(or $(wildcard ../libft),$(wildcard ../Libft),$(wildcard ../LIBFT))
 PRINTF_DIR  := $(or $(wildcard ../printf),$(wildcard ../Printf),$(wildcard ../PRINTF))
+GNL_DIR     := $(or $(wildcard ../get_next_line),$(wildcard ../gnl),$(wildcard ../GNL),$(wildcard ../Get_next_line))
 
-$(info Detected:$(if $(LIBFT_DIR), libft ($(LIBFT_DIR)))$(if $(PRINTF_DIR), printf ($(PRINTF_DIR))))
+$(info Detected:$(if $(LIBFT_DIR), libft ($(LIBFT_DIR)))$(if $(PRINTF_DIR), printf ($(PRINTF_DIR)))$(if $(GNL_DIR), gnl ($(GNL_DIR))))
 
 # ── tester sources ──────────────────────────────────────────────────────────
 SRCS        = src/main.c \
@@ -144,6 +145,46 @@ ifneq ($(PRINTF_DIR),)
 else
     PRINTF_FCLEAN = @true
 endif
+
+# ─────────────────────────────────────────────────────────────
+# ──────────────────────── GNL BLOCK ──────────────────────────
+# ─────────────────────────────────────────────────────────────
+
+ifneq ($(GNL_DIR),)
+    GNL_BONUS_C  := $(wildcard $(GNL_DIR)/get_next_line_bonus.c)
+    GNL_BONUS_UT := $(wildcard $(GNL_DIR)/get_next_line_utils_bonus.c)
+    GNL_MAIN_C   := $(wildcard $(GNL_DIR)/get_next_line.c)
+    GNL_MAIN_UT  := $(wildcard $(GNL_DIR)/get_next_line_utils.c)
+
+    # Bonus and mandatory export the same symbol: compile only one set.
+    # Prefer bonus when present (it is a superset of the mandatory behaviour).
+    ifneq ($(GNL_BONUS_C)$(GNL_BONUS_UT),)
+        GNL_USE_SRCS := $(GNL_BONUS_C) $(GNL_BONUS_UT)
+    else
+        GNL_USE_SRCS := $(GNL_MAIN_C) $(GNL_MAIN_UT)
+    endif
+
+    ifneq ($(GNL_USE_SRCS),)
+        BUFFER_SIZE  ?= 42
+        CFLAGS       += -DWITH_GNL -DBUFFER_SIZE=$(BUFFER_SIZE)
+        INCLUDES     += -I $(GNL_DIR)
+
+        # TEST TO ADD HERE IF NECESSARY
+        SRCS         += $(GNL_USE_SRCS) \
+                        tests/gnl/registry.c \
+                        tests/gnl/gnl_utils.c \
+                        tests/gnl/test_gnl.c \
+                        tests/gnl/test_gnl_lines.c \
+                        tests/gnl/test_gnl_edge.c
+
+        ifneq ($(GNL_BONUS_C)$(GNL_BONUS_UT),)
+            CFLAGS   += -DWITH_GNL_BONUS
+            SRCS     += tests/gnl/test_gnl_bonus.c
+        endif
+    endif
+endif
+
+
 
 # ─────────────────────────────────────────────────────────────
 # ────────────────────── OTHER BLOCK ──────────────────────────
