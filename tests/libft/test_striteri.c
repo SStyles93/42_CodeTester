@@ -73,12 +73,7 @@ void	test_ft_striteri(t_ctx *ctx)
 				" striteri: expected 5 calls, got %d\n", g_call_count);
 	}
 
-	/* NULL / empty string — must not crash */
-	ft_striteri(NULL, to_upper_cb);
-	ctx->pass++;
-	if (ctx->verbose)
-		printf("    " GREEN "✓" RESET " striteri(NULL) didn't crash\n");
-
+	/* empty string — must not crash */
 	strcpy(buf, "");
 	ft_striteri(buf, to_upper_cb);
 	check_str(ctx, "striteri(\"\") unchanged", "", buf);

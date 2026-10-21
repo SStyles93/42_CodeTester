@@ -112,7 +112,7 @@ make re           # clean rebuild
 
 ### Libft
 
-All 43 standard Libft functions have a dedicated suite, plus a `memory` suite that stress-tests malloc-failure handling:
+All 43 standard Libft functions have a dedicated suite, plus a `memory` suite that checks the allocating functions for leaks:
 
 | Category | Functions |
 |---|---|
@@ -124,7 +124,7 @@ All 43 standard Libft functions have a dedicated suite, plus a `memory` suite th
 | Allocation | `ft_calloc` |
 | File descriptors | `ft_putchar_fd`, `ft_putstr_fd`, `ft_putendl_fd`, `ft_putnbr_fd` |
 | Linked list (bonus) | `ft_lstnew`, `ft_lstadd_front`, `ft_lstadd_back`, `ft_lstsize`, `ft_lstlast`, `ft_lstdelone`, `ft_lstclear`, `ft_lstiter`, `ft_lstmap` |
-| Memory checks | `memory` (malloc-failure injection, Linux) |
+| Memory checks | `memory` (leak check, Linux) |
 
 ### ft_printf
 

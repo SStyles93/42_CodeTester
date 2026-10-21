@@ -115,4 +115,8 @@ void	test_ft_split(t_ctx *ctx)
 
 	/* multiple consecutive separators */
 	check_split(ctx, "split(\"one   two\",' ')", ft_split("one   two", ' '), exp2, 2);
+
+	/* '\0' separator: never matches inside the string → whole string */
+	check_split(ctx, "split(\"hello\",'\\0')", ft_split("hello", '\0'), exp1, 1);
+	check_split_empty(ctx, "split(\"\",'\\0')", ft_split("", '\0'));
 }

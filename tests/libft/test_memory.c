@@ -4,11 +4,10 @@
 #include <string.h>
 
 /*
-** Memory suite: for every libft function that allocates, check that
-**   1. a successful call leaves nothing behind once the result is freed;
-**   2. when the Nth malloc inside the call fails (for every N the call
-**      makes), the function returns NULL and frees everything it had
-**      already allocated (e.g. ft_split's partial words).
+** Memory suite: for every libft function that allocates, check that a
+** successful call leaves nothing behind once the result is freed.
+** malloc failure is not injected here: the moulinette doesn't test it, and
+** an unprotected malloc would crash instead of failing a check.
 ** Needs the malloc wrapper from src/memcheck.c (Linux only).
 */
 
@@ -97,36 +96,17 @@ static void	check_case(t_ctx *ctx, const void *arg)
 	const t_memcase	*mc;
 	char			label[128];
 	void			*result;
-	int				allocs;
 	int				leaked;
-	int				n;
 
 	mc = (const t_memcase *)arg;
-	/* 1. normal call: result freed by us → nothing may remain */
+	/* normal call: result freed by us → nothing may remain */
 	mem_begin(0);
 	result = mc->call();
-	allocs = mem_alloc_count();
 	mc->release(result);
 	leaked = mem_end();
 	snprintf(label, sizeof(label), "%s: leaked blocks after free(result)",
 		mc->name);
 	check_int(ctx, label, 0, leaked);
-	/* 2. make each of its allocations fail in turn */
-	n = 1;
-	while (n <= allocs)
-	{
-		mem_begin(n);
-		result = mc->call();
-		snprintf(label, sizeof(label), "%s: malloc #%d of %d fails → NULL",
-			mc->name, n, allocs);
-		check_ptr(ctx, label, NULL, result);
-		mc->release(result);
-		leaked = mem_end();
-		snprintf(label, sizeof(label),
-			"%s: malloc #%d of %d fails → leaked blocks", mc->name, n, allocs);
-		check_int(ctx, label, 0, leaked);
-		n++;
-	}
 }
 
 void	test_memory(t_ctx *ctx)
