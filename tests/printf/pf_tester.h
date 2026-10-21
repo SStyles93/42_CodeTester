@@ -48,12 +48,20 @@ extern char	g_pf_got[PF_BUF_SIZE];
 int		pf_capture_begin(t_pfcap *cap);
 int		pf_capture_end(t_pfcap *cap, char *buf, size_t size);
 void	pf_report(t_ctx *ctx, const char *label, const t_pfcase *c);
+void	pf_report_alt(t_ctx *ctx, const char *label, const t_pfcase *c,
+			const char *alt_exp);
 void	pf_print_escaped(const char *s, int len);
 
 /*
 ** PF_L(ctx, label, format, args...): run snprintf and ft_printf with the same
 ** arguments and compare the bytes written and the return value.
 ** PF(ctx, format, args...): same, the label is the call's source text.
+**
+** PF_L_ALT(ctx, label, alt_exp, format, args...): like PF_L but also accepts
+** alt_exp as a valid output.  Use for cases where two platforms produce
+** different but equally correct strings (e.g. "%p" with NULL: Linux gives
+** "(nil)", macOS gives "0x0").  Whichever snprintf produces is the primary
+** expected; alt_exp covers the other platform.
 */
 # define PF_L(ctx, label, ...) do { \
 	t_pfcase	pf_c_; \
@@ -64,6 +72,17 @@ void	pf_print_escaped(const char *s, int len);
 		pf_c_.got_ret = ft_printf(__VA_ARGS__); \
 	pf_c_.got_len = pf_capture_end(&pf_c_.cap, g_pf_got, PF_BUF_SIZE); \
 	pf_report((ctx), (label), &pf_c_); \
+} while (0)
+
+# define PF_L_ALT(ctx, label, alt_exp, ...) do { \
+	t_pfcase	pf_c_; \
+	pf_c_.exp_ret = snprintf(g_pf_exp, PF_BUF_SIZE, __VA_ARGS__); \
+	pf_c_.cap_ok = (pf_capture_begin(&pf_c_.cap) == 0); \
+	pf_c_.got_ret = -1; \
+	if (pf_c_.cap_ok) \
+		pf_c_.got_ret = ft_printf(__VA_ARGS__); \
+	pf_c_.got_len = pf_capture_end(&pf_c_.cap, g_pf_got, PF_BUF_SIZE); \
+	pf_report_alt((ctx), (label), &pf_c_, (alt_exp)); \
 } while (0)
 
 # define PF(ctx, ...) PF_L(ctx, #__VA_ARGS__, __VA_ARGS__)

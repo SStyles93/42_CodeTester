@@ -35,4 +35,20 @@ void	test_ft_strdup(t_ctx *ctx)
 		}
 		free(r);
 	}
+
+	/* NULL input → NULL return without crash */
+	r = ft_strdup(NULL);
+	if (r == NULL)
+	{
+		ctx->pass++;
+		if (ctx->verbose)
+			printf("    " GREEN "✓" RESET " ft_strdup(NULL) → NULL\n");
+	}
+	else
+	{
+		ctx->fail++;
+		if (ctx->verbose)
+			printf("    " RED "✗" RESET " ft_strdup(NULL) → expected NULL\n");
+		free(r);
+	}
 }
