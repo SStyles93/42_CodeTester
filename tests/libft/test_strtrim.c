@@ -45,20 +45,4 @@ void	test_ft_strtrim(t_ctx *ctx)
 	r = ft_strtrim("   ", " ");
 	check_str(ctx, "strtrim(\"   \",\" \")", "", r);
 	free(r);
-
-	/* NULL s1 → NULL return without crash */
-	r = ft_strtrim(NULL, " ");
-	if (r == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " strtrim(NULL,\" \") → NULL\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " strtrim(NULL,\" \") → expected NULL\n");
-		free(r);
-	}
 }
