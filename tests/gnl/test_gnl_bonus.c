@@ -39,11 +39,11 @@ void	test_gnl_two_fd(t_ctx *ctx)
 	free(line);
 
 	line = g_gnl(fd1);
-	check_str(ctx, "fd1 EOF", NULL, line);
+	check_str(ctx, "fd1 call 3", NULL, line);
 	free(line);
 
 	line = g_gnl(fd2);
-	check_str(ctx, "fd2 EOF", NULL, line);
+	check_str(ctx, "fd2 call 3", NULL, line);
 	free(line);
 
 	close(fd1);
@@ -97,15 +97,15 @@ void	test_gnl_three_fd(t_ctx *ctx)
 	free(line);
 
 	line = g_gnl(fd3);
-	check_str(ctx, "fd3 call 2 → NULL", NULL, line);
+	check_str(ctx, "fd3 call 2", NULL, line);
 	free(line);
 
 	line = g_gnl(fd1);
-	check_str(ctx, "fd1 call 3 → NULL", NULL, line);
+	check_str(ctx, "fd1 call 3", NULL, line);
 	free(line);
 
 	line = g_gnl(fd2);
-	check_str(ctx, "fd2 call 3 → NULL", NULL, line);
+	check_str(ctx, "fd2 call 3", NULL, line);
 	free(line);
 
 	close(fd1);

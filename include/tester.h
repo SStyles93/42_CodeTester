@@ -42,7 +42,23 @@ typedef struct s_project
 	int			informational;	/* results shown, but never counted as fails */
 }	t_project;
 
-/* Assertion helpers (src/utils.c) */
+/* Enough for any value formatted by fmt_bytes() / fmt_str(). */
+# define SHOW_BUF 640
+
+/*
+** Assertion helpers (src/utils.c). Every result is one line:
+**   ✓ <name> → <value>
+**   ✗ <name> → expected: <value> → got: <value>
+*/
+const char	*fmt_bytes(char *buf, size_t size, const char *s, size_t len);
+const char	*fmt_str(char *buf, size_t size, const char *s);
+void	report_pass(t_ctx *ctx, const char *label, const char *value);
+void	report_fail(t_ctx *ctx, const char *label, const char *expected,
+			const char *got);
+void	check_ok(t_ctx *ctx, const char *label, int ok, const char *why);
+void	check_offset(t_ctx *ctx, const char *label, const void *base,
+			const void *expected, const void *got);
+void	check_sign(t_ctx *ctx, const char *label, int expected, int got);
 void	check_bool(t_ctx *ctx, const char *label, int expected, int got);
 void	check_int(t_ctx *ctx, const char *label, int expected, int got);
 void	check_uint(t_ctx *ctx, const char *label, unsigned int expected, unsigned int got);

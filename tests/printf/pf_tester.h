@@ -12,7 +12,7 @@
 ** Linux, libSystem on macOS).
 **
 ** Some cases deliberately use flag/specifier combinations the C standard
-** leaves undefined (printf_undefined suite), so silence the compiler's
+** leaves undefined (Printf_original suites), so silence the compiler's
 ** format checks for the test files.
 */
 # pragma GCC diagnostic ignored "-Wformat"
@@ -50,7 +50,6 @@ int		pf_capture_end(t_pfcap *cap, char *buf, size_t size);
 void	pf_report(t_ctx *ctx, const char *label, const t_pfcase *c);
 void	pf_report_alt(t_ctx *ctx, const char *label, const t_pfcase *c,
 			const char *alt_exp);
-void	pf_print_escaped(const char *s, int len);
 
 /*
 ** PF_L(ctx, label, format, args...): run snprintf and ft_printf with the same

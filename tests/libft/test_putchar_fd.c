@@ -1,12 +1,5 @@
 #include "../../include/tester.h"
 
-/*
-** NOTES on ft_putchar_fd.c:
-**   - Uses '#include <libft.h>' (angle brackets) — should be '"libft.h"'.
-**     Compiles only when the Libft directory is on the include path.
-**   - Implementation itself is correct.
-*/
-
 #include "../../include/weak_functions.h"
 
 /* Write c to a fresh pipe and read back what arrived. */
@@ -19,7 +12,7 @@ static void	t_putchar(t_ctx *ctx, const char *label, char c,
 
 	if (pipe(pfd) < 0)
 	{
-		ctx->fail++;
+		check_ok(ctx, label, 0, "pipe() failed");
 		return ;
 	}
 	ft_putchar_fd(c, pfd[1]);

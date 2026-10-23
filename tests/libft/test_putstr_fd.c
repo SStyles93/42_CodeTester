@@ -11,7 +11,7 @@ static void	t_putstr(t_ctx *ctx, const char *label, const char *s,
 
 	if (pipe(pfd) < 0)
 	{
-		ctx->fail++;
+		check_ok(ctx, label, 0, "pipe() failed");
 		return ;
 	}
 	ft_putstr_fd((char *)s, pfd[1]);

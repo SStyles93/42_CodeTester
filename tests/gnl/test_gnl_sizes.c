@@ -9,25 +9,35 @@
 ** make re BUFFER_SIZE=1 (or `make gnl-sizes` for 1, 42, 9999, 10000000).
 */
 
-/* check_str, without printing lines too long to read. */
+/* check_str, but long lines are shown as their length, not their bytes. */
 static void	check_long_str(t_ctx *ctx, const char *label, const char *expected,
 	const char *got)
 {
+	char	e[48];
+	char	g[48];
+
 	if (strlen(expected) <= 80)
 	{
 		check_str(ctx, label, expected, got);
 		return ;
 	}
-	check_bool(ctx, label, 1, got && strcmp(got, expected) == 0);
-	if (ctx->verbose && (!got || strcmp(got, expected) != 0))
-		printf(DIM "        expected %zu chars, got %s%zu chars" RESET "\n",
-			strlen(expected), got ? "" : "NULL, ", got ? strlen(got) : 0);
+	snprintf(e, sizeof(e), "%zu chars", strlen(expected));
+	if (got)
+		snprintf(g, sizeof(g), "%zu chars", strlen(got));
+	else
+		snprintf(g, sizeof(g), "NULL");
+	if (got && strcmp(got, expected) == 0)
+		report_pass(ctx, label, g);
+	else
+		report_fail(ctx, label, e, got && strlen(got) == strlen(expected)
+			? "same length, different bytes" : g);
 }
 
 /* One line of `len` 'x' (+ "\n" if nl), read twice: the line, then NULL. */
 static void	check_one_line(t_ctx *ctx, const char *name, size_t len, int nl)
 {
-	char	label[96];
+	char	name_len[96];
+	char	label[128];
 	char	*content;
 	char	*line;
 	int		fd;
@@ -36,13 +46,13 @@ static void	check_one_line(t_ctx *ctx, const char *name, size_t len, int nl)
 	fd = content ? gnl_open_file(content) : -1;
 	if (fd >= 0)
 	{
-		line = g_gnl(fd);
-		snprintf(label, sizeof(label), "%s (%zu chars%s)", name, len,
+		snprintf(name_len, sizeof(name_len), "%s (%zu chars%s)", name, len,
 			nl ? " + \\n" : ", no \\n");
-		check_long_str(ctx, label, content, line);
+		line = g_gnl(fd);
+		check_long_str(ctx, name_len, content, line);
 		free(line);
 		line = g_gnl(fd);
-		snprintf(label, sizeof(label), "%s then NULL", name);
+		snprintf(label, sizeof(label), "%s then NULL", name_len);
 		check_str(ctx, label, NULL, line);
 		free(line);
 		gnl_drain(fd);
@@ -95,15 +105,17 @@ void	test_gnl_sizes(t_ctx *ctx)
 		check_one_line(ctx, "BUFFER_SIZE - 1", BUFFER_SIZE - 1, 1);
 	check_one_line(ctx, "BUFFER_SIZE", BUFFER_SIZE, 1);
 	check_one_line(ctx, "BUFFER_SIZE + 1", BUFFER_SIZE + 1, 1);
-	check_one_line(ctx, "BUFFER_SIZE, no \\n", BUFFER_SIZE, 0);
-	check_one_line(ctx, "BUFFER_SIZE + 1, no \\n", BUFFER_SIZE + 1, 0);
+	check_one_line(ctx, "BUFFER_SIZE", BUFFER_SIZE, 0);
+	check_one_line(ctx, "BUFFER_SIZE + 1", BUFFER_SIZE + 1, 0);
 	check_one_line(ctx, "2 * BUFFER_SIZE", 2 * (size_t)BUFFER_SIZE, 1);
 	/* "\n" exactly at the end of a read() (the line is BUFFER_SIZE bytes) */
 	if (BUFFER_SIZE > 1)
-		check_two_lines(ctx, "2 lines of BUFFER_SIZE", BUFFER_SIZE - 1);
-	check_two_lines(ctx, "2 lines of BUFFER_SIZE + 1", BUFFER_SIZE);
-	check_one_line(ctx, "10000-char line", 10000, 1);
-	check_one_line(ctx, "10000-char line", 10000, 0);
+		check_two_lines(ctx, "2 lines of BUFFER_SIZE bytes (incl. \\n)",
+			BUFFER_SIZE - 1);
+	check_two_lines(ctx, "2 lines of BUFFER_SIZE + 1 bytes (incl. \\n)",
+		BUFFER_SIZE);
+	check_one_line(ctx, "long line", 10000, 1);
+	check_one_line(ctx, "long line", 10000, 0);
 }
 
 /*
@@ -148,7 +160,7 @@ void	test_gnl_big_file(t_ctx *ctx)
 		i++;
 	}
 	if (ok)
-		check_bool(ctx, "1000-line file: every line in order", 1, 1);
+		check_ok(ctx, "1000-line file: every line in order", 1, NULL);
 	line = g_gnl(fd);
 	check_str(ctx, "1000-line file: NULL after the last line", NULL, line);
 	free(line);
@@ -164,6 +176,7 @@ void	test_gnl_big_file(t_ctx *ctx)
 */
 void	test_gnl_read_little(t_ctx *ctx)
 {
+	char	why[96];
 	char	*content;
 	char	*line;
 	long	offset;
@@ -185,11 +198,10 @@ void	test_gnl_read_little(t_ctx *ctx)
 	free(line);
 	offset = (long)lseek(fd, 0, SEEK_CUR);
 	limit = (long)((first_len + BUFFER_SIZE - 1) / BUFFER_SIZE) * BUFFER_SIZE;
-	check_bool(ctx, "does not read further than needed for the first line",
-		1, offset >= 0 && offset <= limit);
-	if (ctx->verbose && offset > limit)
-		printf(DIM "        read %ld bytes, at most %ld needed" RESET "\n",
-			offset, limit);
+	snprintf(why, sizeof(why), "read %ld bytes, at most %ld needed", offset,
+		limit);
+	check_ok(ctx, "does not read further than needed for the first line",
+		offset >= 0 && offset <= limit, why);
 	gnl_drain(fd);
 	close(fd);
 }

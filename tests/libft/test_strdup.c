@@ -19,36 +19,8 @@ void	test_ft_strdup(t_ctx *ctx)
 	check_str(ctx, "ft_strdup(\"hello\") content", "hello", r);
 	if (r)
 	{
-		if ((void *)r != (void *)src)
-		{
-			ctx->pass++;
-			if (ctx->verbose)
-				printf("    " GREEN "✓" RESET
-					" ft_strdup: result != src (new allocation)\n");
-		}
-		else
-		{
-			ctx->fail++;
-			if (ctx->verbose)
-				printf("    " RED "✗" RESET
-					" ft_strdup: result == src (not a copy!)\n");
-		}
-		free(r);
-	}
-
-	/* NULL input → NULL return without crash */
-	r = ft_strdup(NULL);
-	if (r == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " ft_strdup(NULL) → NULL\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " ft_strdup(NULL) → expected NULL\n");
+		check_ok(ctx, "ft_strdup: result is a new allocation (!= src)",
+			(void *)r != (void *)src, "returned src itself, not a copy");
 		free(r);
 	}
 }

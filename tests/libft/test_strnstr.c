@@ -31,33 +31,7 @@ static void	t_strnstr(t_ctx *ctx, const char *label,
 
 	ref = ref_strnstr(big, little, len);
 	got = ft_strnstr(big, little, len);
-	if (ref == NULL && got == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s (both NULL)\n", label);
-	}
-	else if (ref == NULL || got == NULL)
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s: expected %s, got %s\n",
-				label, ref ? "ptr" : "NULL", got ? "ptr" : "NULL");
-	}
-	else if ((ref - big) == (got - big))
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s (offset %ld)\n",
-				label, (long)(ref - big));
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s: expected offset %ld, got %ld\n",
-				label, (long)(ref - big), (long)(got - big));
-	}
+	check_offset(ctx, label, big, ref, got);
 }
 
 void	test_ft_strnstr(t_ctx *ctx)
@@ -65,8 +39,8 @@ void	test_ft_strnstr(t_ctx *ctx)
 	t_strnstr(ctx, "found at start", "hello world", "hello", 11);
 	t_strnstr(ctx, "found in middle", "hello world", "world", 11);
 	t_strnstr(ctx, "not found", "hello world", "xyz", 11);
-	t_strnstr(ctx, "empty needle → big", "hello", "", 5);
-	t_strnstr(ctx, "len=0 → NULL", "hello", "hello", 0);
+	t_strnstr(ctx, "empty needle (returns big)", "hello", "", 5);
+	t_strnstr(ctx, "len=0", "hello", "hello", 0);
 	/* needle found exactly at the boundary of len */
 	t_strnstr(ctx, "needle at exact end of len", "abcdef", "ef", 6);
 	/* needle crosses len by one byte: not enough room */

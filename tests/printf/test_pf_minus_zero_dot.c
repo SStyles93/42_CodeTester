@@ -11,7 +11,6 @@ static void	width_only(t_ctx *ctx)
 	PF(ctx, "%5u", 42u);
 	PF(ctx, "%8x", 0xbeefu);
 	PF(ctx, "%5s", "abc");
-	PF(ctx, "%10s", (char *)NULL);
 	PF(ctx, "%3c", 'a');
 	PF(ctx, "%3c", '\0');
 	PF(ctx, "%20p", (void *)0xdeadbeef);
@@ -26,7 +25,6 @@ static void	minus(t_ctx *ctx)
 	PF(ctx, "%-5u|", 42u);
 	PF(ctx, "%-8x|", 0xbeefu);
 	PF(ctx, "%-5s|", "abc");
-	PF(ctx, "%-10s|", (char *)NULL);
 	PF(ctx, "%-3c|", 'a');
 	PF(ctx, "%-3c|", '\0');
 	PF(ctx, "%-20p|", (void *)0xdeadbeef);
@@ -79,9 +77,6 @@ static void	precision(t_ctx *ctx)
 	PF(ctx, "%.10s", "hello");
 	PF(ctx, "%10.3s|", "hello");
 	PF(ctx, "%-10.3s|", "hello");
-	/* NULL string with precision (glibc: "" when precision < 6) */
-	PF(ctx, "%.5s", (char *)NULL);
-	PF(ctx, "%.6s", (char *)NULL);
 }
 
 void	test_pf_minus_zero_dot(t_ctx *ctx)

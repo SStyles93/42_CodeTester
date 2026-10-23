@@ -27,7 +27,7 @@ static void	check_regular_file(t_ctx *ctx)
 	check_str(ctx, "regular file call 3 (no \\n at EOF)", "no newline", line);
 	free(line);
 	line = g_gnl(fd);
-	check_str(ctx, "regular file call 4 → NULL", NULL, line);
+	check_str(ctx, "regular file call 4", NULL, line);
 	free(line);
 	close(fd);
 }
@@ -57,7 +57,7 @@ static void	check_stdin(t_ctx *ctx)
 	check_str(ctx, "stdin call 2", "from stdin 2\n", line);
 	free(line);
 	line = g_gnl(0);
-	check_str(ctx, "stdin call 3 → NULL", NULL, line);
+	check_str(ctx, "stdin call 3", NULL, line);
 	free(line);
 	gnl_drain(0);
 	dup2(saved, 0);
@@ -75,10 +75,10 @@ static void	check_after_eof(t_ctx *ctx)
 		return ;
 	free(g_gnl(fd));
 	line = g_gnl(fd);
-	check_str(ctx, "after EOF call 1 → NULL", NULL, line);
+	check_str(ctx, "after EOF call 1", NULL, line);
 	free(line);
 	line = g_gnl(fd);
-	check_str(ctx, "after EOF call 2 → NULL", NULL, line);
+	check_str(ctx, "after EOF call 2", NULL, line);
 	free(line);
 	close(fd);
 }
@@ -89,17 +89,17 @@ static void	check_invalid_fds(t_ctx *ctx)
 	int		fd;
 
 	line = g_gnl(-1);
-	check_str(ctx, "fd=-1 → NULL", NULL, line);
+	check_str(ctx, "fd=-1", NULL, line);
 	free(line);
 	line = g_gnl(4242);
-	check_str(ctx, "fd=4242 (never opened) → NULL", NULL, line);
+	check_str(ctx, "fd=4242 (never opened)", NULL, line);
 	free(line);
 	fd = gnl_open_pipe("closed\n");
 	if (fd >= 0)
 	{
 		close(fd);
 		line = g_gnl(fd);
-		check_str(ctx, "closed fd → NULL", NULL, line);
+		check_str(ctx, "closed fd", NULL, line);
 		free(line);
 	}
 #ifndef _WIN32
@@ -107,7 +107,7 @@ static void	check_invalid_fds(t_ctx *ctx)
 	if (fd >= 0)
 	{
 		line = g_gnl(fd);
-		check_str(ctx, "directory fd (read() fails) → NULL", NULL, line);
+		check_str(ctx, "directory fd (read() fails)", NULL, line);
 		free(line);
 		close(fd);
 	}
@@ -116,35 +116,41 @@ static void	check_invalid_fds(t_ctx *ctx)
 
 /*
 ** read() error in the middle of a file: the fd is closed after one line,
-** get_next_line() must return NULL, and a new file opened on the same fd
-** number must be read from its start, not from the old file's leftovers.
+** and the next call must return NULL ("NULL if ... an error occurred").
+** Then the same file is opened again on the same fd number and must be read
+** from its first line: the static buffer has to be cleared when read()
+** fails (same check as francinette's read_error test).
 */
 static void	check_read_error(t_ctx *ctx)
 {
-	char	*line;
-	int		fd;
-	int		other;
+	static const char	*content = "line 1\nline 2\nline 3\n";
+	char				*line;
+	int					fd;
+	int					again;
 
-	fd = gnl_open_file("old 1\nold 2\nold 3\n");
+	fd = gnl_open_file(content);
 	if (fd < 0)
 		return ;
 	line = g_gnl(fd);
-	check_str(ctx, "read error: first line", "old 1\n", line);
+	check_str(ctx, "read error: first line", "line 1\n", line);
 	free(line);
 	close(fd);
 	line = g_gnl(fd);
-	check_str(ctx, "read error: closed mid-file → NULL", NULL, line);
+	check_str(ctx, "read error: closed mid-file", NULL, line);
 	free(line);
-	other = gnl_open_file("new 1\nnew 2\n");
-	if (other < 0)
+	again = gnl_open_file(content);
+	if (again < 0)
 		return ;
-	if (other != fd)
+	if (again != fd)
 	{
-		dup2(other, fd);
-		close(other);
+		dup2(again, fd);
+		close(again);
 	}
 	line = g_gnl(fd);
-	check_str(ctx, "read error: reopened fd starts fresh", "new 1\n", line);
+	check_str(ctx, "read error: same file reopened, call 1", "line 1\n", line);
+	free(line);
+	line = g_gnl(fd);
+	check_str(ctx, "read error: same file reopened, call 2", "line 2\n", line);
 	free(line);
 	gnl_drain(fd);
 	close(fd);

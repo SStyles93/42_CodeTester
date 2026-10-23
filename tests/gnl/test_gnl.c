@@ -11,7 +11,7 @@ void	test_get_next_line(t_ctx *ctx)
 
 	/* invalid fd must return NULL without crashing */
 	line = g_gnl(-1);
-	check_str(ctx, "fd=-1 → NULL", NULL, line);
+	check_str(ctx, "fd=-1", NULL, line);
 	free(line);
 
 	/* pipe closed with no bytes written → immediate EOF */
@@ -19,7 +19,7 @@ void	test_get_next_line(t_ctx *ctx)
 	if (fd >= 0)
 	{
 		line = g_gnl(fd);
-		check_str(ctx, "empty input → NULL", NULL, line);
+		check_str(ctx, "empty input", NULL, line);
 		free(line);
 		close(fd);
 	}
@@ -32,7 +32,7 @@ void	test_get_next_line(t_ctx *ctx)
 		check_str(ctx, "\"hello\\n\" call 1", "hello\n", line);
 		free(line);
 		line = g_gnl(fd);
-		check_str(ctx, "\"hello\\n\" call 2 → NULL", NULL, line);
+		check_str(ctx, "\"hello\\n\" call 2", NULL, line);
 		free(line);
 		close(fd);
 	}
@@ -45,7 +45,7 @@ void	test_get_next_line(t_ctx *ctx)
 		check_str(ctx, "\"hello\" (no \\n) call 1", "hello", line);
 		free(line);
 		line = g_gnl(fd);
-		check_str(ctx, "\"hello\" call 2 → NULL", NULL, line);
+		check_str(ctx, "\"hello\" call 2", NULL, line);
 		free(line);
 		close(fd);
 	}
@@ -58,7 +58,7 @@ void	test_get_next_line(t_ctx *ctx)
 		check_str(ctx, "\"\\n\" call 1", "\n", line);
 		free(line);
 		line = g_gnl(fd);
-		check_str(ctx, "\"\\n\" call 2 → NULL", NULL, line);
+		check_str(ctx, "\"\\n\" call 2", NULL, line);
 		free(line);
 		close(fd);
 	}

@@ -66,13 +66,13 @@ static void	check_source(t_ctx *ctx, const void *arg)
 				break ;
 			free(line);
 		}
-		snprintf(label, sizeof(label), "%s: malloc #%d of %d fails → NULL",
+		snprintf(label, sizeof(label), "%s: malloc #%d of %d fails: return value",
 			src->name, n, allocs);
 		check_ptr(ctx, label, NULL, line);
 		free(line);
 		read_all(fd);
 		snprintf(label, sizeof(label),
-			"%s: malloc #%d of %d fails → leaked blocks", src->name, n, allocs);
+			"%s: malloc #%d of %d fails: leaked blocks", src->name, n, allocs);
 		check_int(ctx, label, 0, mem_end());
 		close(fd);
 		n++;

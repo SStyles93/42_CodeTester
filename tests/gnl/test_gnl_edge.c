@@ -88,7 +88,7 @@ void	test_gnl_edge(t_ctx *ctx)
 		check_str(ctx, "line+\\n then EOF call 1", "last\n", line);
 		free(line);
 		line = g_gnl(fd);
-		check_str(ctx, "line+\\n then EOF call 2 → NULL", NULL, line);
+		check_str(ctx, "line+\\n then EOF call 2", NULL, line);
 		free(line);
 		close(fd);
 	}

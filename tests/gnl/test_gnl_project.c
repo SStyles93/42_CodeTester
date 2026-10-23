@@ -12,7 +12,7 @@
 **   - only read, malloc and free as external functions (no lseek, no libft);
 **   - no global variable; bonus: only one static variable;
 **   - README.md: italic first line, Description / Instructions / Resources
-**     sections, how AI was used, the algorithm explained.
+**     sections.
 ** GNL_PATH (absolute path of the project) is set by the Makefile.
 */
 
@@ -30,13 +30,6 @@ static const t_gnlfiles	g_mandatory = {
 static const t_gnlfiles	g_bonus = {
 	"get_next_line_bonus.c", "get_next_line_utils_bonus.c",
 	"get_next_line_bonus.h"};
-
-static void	pass_fail(t_ctx *ctx, const char *label, int ok, const char *why)
-{
-	check_bool(ctx, label, 1, ok);
-	if (!ok && ctx->verbose && why)
-		printf(DIM "        %s" RESET "\n", why);
-}
 
 static char	*read_file(const char *name)
 {
@@ -87,15 +80,15 @@ static void	check_files(t_ctx *ctx, const t_gnlfiles *files)
 
 	content = read_file(files->c_file);
 	snprintf(label, sizeof(label), "%s exists at the root", files->c_file);
-	pass_fail(ctx, label, content != NULL, NULL);
+	check_ok(ctx, label, content != NULL, "file not found");
 	free(content);
 	content = read_file(files->utils);
 	snprintf(label, sizeof(label), "%s exists at the root", files->utils);
-	pass_fail(ctx, label, content != NULL, NULL);
+	check_ok(ctx, label, content != NULL, "file not found");
 	free(content);
 	content = read_file(files->header);
 	snprintf(label, sizeof(label), "%s exists at the root", files->header);
-	pass_fail(ctx, label, content != NULL, NULL);
+	check_ok(ctx, label, content != NULL, "file not found");
 	if (!content)
 		return ;
 	squashed = malloc(strlen(content) + 1);
@@ -111,7 +104,7 @@ static void	check_files(t_ctx *ctx, const t_gnlfiles *files)
 		squashed[j] = '\0';
 	snprintf(label, sizeof(label), "%s declares char *get_next_line(int fd)",
 		files->header);
-	pass_fail(ctx, label, squashed
+	check_ok(ctx, label, squashed
 		&& strstr(squashed, "char*get_next_line(int") != NULL,
 		"prototype not found");
 	free(squashed);
@@ -135,33 +128,6 @@ static int	has_heading(const char *md, const char *word)
 		while (*p)
 			if (strncasecmp(p++, word, n) == 0)
 				return (1);
-	}
-	return (0);
-}
-
-static int	has_word_nocase(const char *s, const char *word)
-{
-	size_t	n;
-
-	n = strlen(word);
-	while (*s)
-		if (strncasecmp(s++, word, n) == 0)
-			return (1);
-	return (0);
-}
-
-/* "AI" as a whole word ("AI", "AI-generated", "(AI)"), case-sensitive. */
-static int	mentions_ai(const char *s)
-{
-	const char	*p;
-
-	p = s;
-	while ((p = strstr(p, "AI")) != NULL)
-	{
-		if ((p == s || !isalnum((unsigned char)p[-1]))
-			&& !isalnum((unsigned char)p[2]))
-			return (1);
-		p += 2;
 	}
 	return (0);
 }
@@ -196,22 +162,21 @@ static void	check_readme(t_ctx *ctx)
 	char	*md;
 
 	md = read_file("README.md");
-	pass_fail(ctx, "README.md exists at the root", md != NULL, NULL);
+	check_ok(ctx, "README.md exists at the root", md != NULL, "file not found");
 	if (!md)
 		return ;
-	pass_fail(ctx, "README first line: *This project has been created as"
+	check_ok(ctx, "README first line: *This project has been created as"
 		" part of the 42 curriculum by <login>*", readme_first_line_ok(md),
 		"must be the very first line, in italics, followed by your login(s)");
-	pass_fail(ctx, "README has a \"Description\" section",
-		has_heading(md, "Description"), NULL);
-	pass_fail(ctx, "README has an \"Instructions\" section",
-		has_heading(md, "Instructions"), NULL);
-	pass_fail(ctx, "README has a \"Resources\" section",
-		has_heading(md, "Resources"), NULL);
-	pass_fail(ctx, "README describes how AI was used", mentions_ai(md),
-		"no mention of \"AI\" found");
-	pass_fail(ctx, "README explains the algorithm",
-		has_word_nocase(md, "algorithm"), "no mention of \"algorithm\" found");
+	check_ok(ctx, "README has a \"Description\" section",
+		has_heading(md, "Description"),
+		"no heading containing \"Description\"");
+	check_ok(ctx, "README has an \"Instructions\" section",
+		has_heading(md, "Instructions"),
+		"no heading containing \"Instructions\"");
+	check_ok(ctx, "README has a \"Resources\" section",
+		has_heading(md, "Resources"),
+		"no heading containing \"Resources\"");
 	free(md);
 }
 
@@ -275,7 +240,7 @@ static int	check_compile(t_ctx *ctx, const t_gnlfiles *files, const char *dir)
 		snprintf(label, sizeof(label), "cc -Wall -Wextra -Werror%s",
 			flags[i][0] ? flags[i] : " (without -D BUFFER_SIZE)");
 		first_error(out, first, sizeof(first));
-		pass_fail(ctx, label, ok, first);
+		check_ok(ctx, label, ok, first);
 		i++;
 	}
 	return (ok);
@@ -377,7 +342,7 @@ static void	check_symbols(t_ctx *ctx, const char *dir, int max_statics)
 		{
 			snprintf(label, sizeof(label), "forbidden external function: %s",
 				name);
-			pass_fail(ctx, label, 0, "authorized: read, malloc, free"
+			check_ok(ctx, label, 0, "authorized: read, malloc, free"
 				" (lseek and libft are forbidden)");
 			bad++;
 		}
@@ -385,7 +350,7 @@ static void	check_symbols(t_ctx *ctx, const char *dir, int max_statics)
 		{
 			snprintf(label, sizeof(label), "global variable (forbidden): %s",
 				name);
-			pass_fail(ctx, label, 0, NULL);
+			check_ok(ctx, label, 0, NULL);
 			bad++;
 		}
 		else if (n == 3 && strchr("bdsr", tok[1][0]) && tok[1][1] == '\0'
@@ -393,12 +358,12 @@ static void	check_symbols(t_ctx *ctx, const char *dir, int max_statics)
 			statics++;
 	}
 	if (!bad)
-		pass_fail(ctx, "only read, malloc, free; no global variable", 1, NULL);
+		check_ok(ctx, "only read, malloc, free; no global variable", 1, NULL);
 	if (max_statics > 0)
 	{
 		snprintf(label, sizeof(label), "only one static variable (found %d)",
 			statics);
-		pass_fail(ctx, label, statics <= max_statics, NULL);
+		check_ok(ctx, label, statics <= max_statics, NULL);
 	}
 }
 

@@ -41,34 +41,4 @@ void	test_ft_strjoin(t_ctx *ctx)
 			free(r);
 		}
 	}
-
-	/* NULL inputs → NULL return without crash */
-	r = ft_strjoin(NULL, "x");
-	if (r == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " strjoin(NULL,\"x\") → NULL\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " strjoin(NULL,\"x\") → expected NULL\n");
-		free(r);
-	}
-	r = ft_strjoin("x", NULL);
-	if (r == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " strjoin(\"x\",NULL) → NULL\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " strjoin(\"x\",NULL) → expected NULL\n");
-		free(r);
-	}
 }

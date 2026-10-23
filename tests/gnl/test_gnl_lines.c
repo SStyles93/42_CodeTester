@@ -20,7 +20,7 @@ void	test_gnl_lines(t_ctx *ctx)
 		check_str(ctx, "2-line call 2", "line2\n", line);
 		free(line);
 		line = g_gnl(fd);
-		check_str(ctx, "2-line call 3 → NULL", NULL, line);
+		check_str(ctx, "2-line call 3", NULL, line);
 		free(line);
 		close(fd);
 	}
@@ -39,7 +39,7 @@ void	test_gnl_lines(t_ctx *ctx)
 		check_str(ctx, "3-line call 3 (no \\n at EOF)", "third", line);
 		free(line);
 		line = g_gnl(fd);
-		check_str(ctx, "3-line call 4 → NULL", NULL, line);
+		check_str(ctx, "3-line call 4", NULL, line);
 		free(line);
 		close(fd);
 	}
@@ -58,7 +58,7 @@ void	test_gnl_lines(t_ctx *ctx)
 		check_str(ctx, "3 newlines call 3", "\n", line);
 		free(line);
 		line = g_gnl(fd);
-		check_str(ctx, "3 newlines call 4 → NULL", NULL, line);
+		check_str(ctx, "3 newlines call 4", NULL, line);
 		free(line);
 		close(fd);
 	}

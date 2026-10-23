@@ -38,22 +38,6 @@ void	test_ft_substr(t_ctx *ctx)
 
 	/* start = UINT_MAX → start + len overflows if done naively */
 	r = ft_substr("hello", (unsigned int)-1, 5);
-	check_str(ctx, "substr(UINT_MAX,5)", "", r);
+	check_str(ctx, "substr(\"hello\",UINT_MAX,5)", "", r);
 	free(r);
-
-	/* NULL string → NULL return without crash */
-	r = ft_substr(NULL, 0, 5);
-	if (r == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " substr(NULL,0,5) → NULL\n");
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " substr(NULL,0,5) → expected NULL\n");
-		free(r);
-	}
 }

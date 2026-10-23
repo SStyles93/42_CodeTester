@@ -117,13 +117,13 @@ static void	check_case(t_ctx *ctx, const void *arg)
 	{
 		mem_begin(n);
 		result = mc->call();
-		snprintf(label, sizeof(label), "%s: malloc #%d of %d fails → NULL",
+		snprintf(label, sizeof(label), "%s: malloc #%d of %d fails: return value",
 			mc->name, n, allocs);
 		check_ptr(ctx, label, NULL, result);
 		mc->release(result);
 		leaked = mem_end();
 		snprintf(label, sizeof(label),
-			"%s: malloc #%d of %d fails → leaked blocks", mc->name, n, allocs);
+			"%s: malloc #%d of %d fails: leaked blocks", mc->name, n, allocs);
 		check_int(ctx, label, 0, leaked);
 		n++;
 	}

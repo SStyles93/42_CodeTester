@@ -1,8 +1,6 @@
 #include "pf_tester.h"
 #include <string.h>
 
-#define PF_SHOW_MAX 120
-
 char	g_pf_exp[PF_BUF_SIZE];
 char	g_pf_got[PF_BUF_SIZE];
 
@@ -43,32 +41,8 @@ int	pf_capture_end(t_pfcap *cap, char *buf, size_t size)
 	return ((int)n);
 }
 
-void	pf_print_escaped(const char *s, int len)
-{
-	int				i;
-	unsigned char	c;
-
-	putchar('"');
-	i = 0;
-	while (i < len && i < PF_SHOW_MAX)
-	{
-		c = (unsigned char)s[i];
-		if (c == '\n')
-			fputs("\\n", stdout);
-		else if (c == '\t')
-			fputs("\\t", stdout);
-		else if (c == '"' || c == '\\')
-			printf("\\%c", c);
-		else if (c < 32 || c >= 127)
-			printf("\\x%02x", c);
-		else
-			putchar(c);
-		i++;
-	}
-	putchar('"');
-	if (len > PF_SHOW_MAX)
-		printf("... (%d bytes)", len);
-}
+/* Same length as fmt_bytes() shows: past it, say where the outputs differ. */
+#define PF_SHOW_MAX 120
 
 static int	first_diff(const char *a, int alen, const char *b, int blen)
 {
@@ -80,119 +54,82 @@ static int	first_diff(const char *a, int alen, const char *b, int blen)
 	return (i);
 }
 
+/* "<escaped output> (return n)", or "error (return n)" for a failed call. */
+static const char	*fmt_output(char *buf, size_t size, const char *s, int len,
+	int ret)
+{
+	char	esc[SHOW_BUF];
+
+	if (ret < 0 && len <= 0)
+		snprintf(buf, size, "error (return %d)", ret);
+	else
+		snprintf(buf, size, "%s (return %d)",
+			fmt_bytes(esc, sizeof(esc), s, len < 0 ? 0 : len), ret);
+	return (buf);
+}
+
 /*
-** Like pf_report, but also accepts alt_exp as a valid output string.
-** Intended for specifier/value combos where two platforms produce different
-** but equally correct text (e.g. "%p" with NULL: "(nil)" vs "0x0").
-** The host snprintf result is always the primary expected; alt_exp covers
-** the other platform.  A "[platform alt]" tag is shown in verbose mode.
+** Compares ft_printf's output and return value to snprintf's.
+** alt_exp (may be NULL) is a second accepted output, for combos where two
+** platforms produce different but equally correct text (e.g. "%p" with
+** NULL: "(nil)" vs "0x0"). The host snprintf result is always the primary
+** expected; a "[platform alt]" tag is shown when alt_exp matched.
 */
 void	pf_report_alt(t_ctx *ctx, const char *label,
 		const t_pfcase *c, const char *alt_exp)
 {
-	int	exp_len;
-	int	alt_len;
-	int	ok;
-	int	ok_alt;
+	char	exp[SHOW_BUF * 2 + 64];
+	char	got[SHOW_BUF + 64];
+	char	alt[SHOW_BUF];
+	int		exp_len;
+	int		alt_len;
+	int		ok;
+	int		ok_alt;
+	size_t	n;
 
+	if (!c->cap_ok)
+	{
+		check_ok(ctx, label, 0, "could not capture stdout");
+		return ;
+	}
 	exp_len = c->exp_ret;
 	if (exp_len >= PF_BUF_SIZE)
 		exp_len = PF_BUF_SIZE - 1;
 	alt_len = alt_exp ? (int)strlen(alt_exp) : -1;
-	if (!c->cap_ok)
-		ok = 0;
-	else if (c->exp_ret < 0)
+	if (c->exp_ret < 0)
 		ok = (c->got_ret == c->exp_ret);
 	else
 		ok = (c->got_ret == c->exp_ret && c->got_len == exp_len
 				&& memcmp(g_pf_exp, g_pf_got, exp_len) == 0);
 	ok_alt = (!ok && alt_exp && c->got_ret == alt_len && c->got_len == alt_len
 			&& memcmp(alt_exp, g_pf_got, alt_len) == 0);
-	if (ok || ok_alt)
-		ctx->pass++;
-	else
-		ctx->fail++;
-	if (!ctx->verbose)
-		return ;
+	fmt_output(got, sizeof(got), g_pf_got, c->got_len, c->got_ret);
 	if (ok || ok_alt)
 	{
-		printf("    " GREEN "✓" RESET " %s → ", label);
-		pf_print_escaped(g_pf_got, c->got_len);
-		printf(" (%d)", c->got_ret);
 		if (ok_alt)
-			printf(" " DIM "[platform alt]" RESET);
-		printf("\n");
+			strncat(got, " " DIM "[platform alt]" RESET,
+				sizeof(got) - strlen(got) - 1);
+		report_pass(ctx, label, got);
 		return ;
 	}
-	printf("    " RED "✗" RESET " %s\n", label);
-	if (!c->cap_ok)
+	fmt_output(exp, sizeof(exp), g_pf_exp, c->exp_ret < 0 ? 0 : exp_len,
+		c->exp_ret);
+	if (alt_exp && c->exp_ret >= 0)
 	{
-		printf("        could not capture stdout\n");
-		return ;
+		n = strlen(exp);
+		snprintf(exp + n, sizeof(exp) - n, " or %s (return %d)",
+			fmt_bytes(alt, sizeof(alt), alt_exp, alt_len), alt_len);
 	}
-	printf("        expected: ");
-	if (c->exp_ret < 0)
-		printf("(error)");
-	else
+	if (c->exp_ret >= 0 && (exp_len > PF_SHOW_MAX || c->got_len > PF_SHOW_MAX))
 	{
-		pf_print_escaped(g_pf_exp, exp_len);
-		if (alt_exp)
-		{
-			printf(" or ");
-			pf_print_escaped(alt_exp, alt_len);
-		}
-	}
-	printf(" return %d\n        got:      ", c->exp_ret);
-	pf_print_escaped(g_pf_got, c->got_len);
-	printf(" return %d\n", c->got_ret);
-	if (c->exp_ret >= 0)
-		printf(DIM "        first difference at byte %d" RESET "\n",
+		n = strlen(got);
+		snprintf(got + n, sizeof(got) - n, " (first difference at byte %d)",
 			first_diff(g_pf_exp, exp_len, g_pf_got, c->got_len));
+	}
+	report_fail(ctx, label, exp, got);
 }
 
 void	pf_report(t_ctx *ctx, const char *label, const t_pfcase *c)
 {
-	int	exp_len;
-	int	ok;
-
-	exp_len = c->exp_ret;
-	if (exp_len >= PF_BUF_SIZE)
-		exp_len = PF_BUF_SIZE - 1;
-	if (!c->cap_ok)
-		ok = 0;
-	else if (c->exp_ret < 0)
-		ok = (c->got_ret == c->exp_ret);
-	else
-		ok = (c->got_ret == c->exp_ret && c->got_len == exp_len
-				&& memcmp(g_pf_exp, g_pf_got, exp_len) == 0);
-	if (ok)
-		ctx->pass++;
-	else
-		ctx->fail++;
-	if (!ctx->verbose)
-		return ;
-	if (ok)
-	{
-		printf("    " GREEN "✓" RESET " %s → ", label);
-		pf_print_escaped(g_pf_got, c->got_len);
-		printf(" (%d)\n", c->got_ret);
-		return ;
-	}
-	printf("    " RED "✗" RESET " %s\n", label);
-	if (!c->cap_ok)
-	{
-		printf("        could not capture stdout\n");
-		return ;
-	}
-	printf("        expected: ");
-	if (c->exp_ret < 0)
-		printf("(error)");
-	else
-		pf_print_escaped(g_pf_exp, exp_len);
-	printf(" return %d\n        got:      ", c->exp_ret);
-	pf_print_escaped(g_pf_got, c->got_len);
-	printf(" return %d\n", c->got_ret);
-	if (c->exp_ret >= 0)
-		printf(DIM "        first difference at byte %d" RESET "\n",
-			first_diff(g_pf_exp, exp_len, g_pf_got, c->got_len));
+	pf_report_alt(ctx, label, c, NULL);
 }

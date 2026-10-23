@@ -9,33 +9,7 @@ static void	t_strchr(t_ctx *ctx, const char *label, const char *s, int c)
 
 	ref = strchr(s, c);
 	got = ft_strchr(s, c);
-	if (ref == NULL && got == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s (both NULL)\n", label);
-	}
-	else if (ref == NULL || got == NULL)
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s: expected %s, got %s\n",
-				label, ref ? "ptr" : "NULL", got ? "ptr" : "NULL");
-	}
-	else if ((ref - s) == (got - s))
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s (offset %ld)\n",
-				label, (long)(ref - s));
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s: expected offset %ld, got %ld\n",
-				label, (long)(ref - s), (long)(got - s));
-	}
+	check_offset(ctx, label, s, ref, got);
 }
 
 void	test_ft_strchr(t_ctx *ctx)
