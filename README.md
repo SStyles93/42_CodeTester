@@ -10,7 +10,8 @@ An interactive C tester for 42 projects.
 | **Library** | **State** | **Grade** |
 |---|---|---|
 | **Libft** | Full ${\color{lightgreen}\text{(including linked-list functions)}}$ | ${\color{lightgreen}\text{100/100}}$ |  
-| **Printf** | Full ${\color{lightgreen}\text{(mandatory + bonus + original printf behaviour)}}$ | ${\color{red}\text{N}}$ |
+| **Printf** | Full ${\color{lightgreen}\text{(mandatory + bonus + original printf behaviour)}}$ | ${\color{lightgreen}\text{125/125}}$ |  
+| **Get_next_line** | ${\color{orange}\text{(In progess)}}$ | ${\color{red}\text{N}}$ |  
 
 
 ## Features
