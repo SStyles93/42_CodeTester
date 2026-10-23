@@ -151,36 +151,38 @@ endif
 # ─────────────────────────────────────────────────────────────
 
 ifneq ($(GNL_DIR),)
-    GNL_BONUS_C  := $(wildcard $(GNL_DIR)/get_next_line_bonus.c)
-    GNL_BONUS_UT := $(wildcard $(GNL_DIR)/get_next_line_utils_bonus.c)
-    GNL_MAIN_C   := $(wildcard $(GNL_DIR)/get_next_line.c)
-    GNL_MAIN_UT  := $(wildcard $(GNL_DIR)/get_next_line_utils.c)
+    GNL_MAN_SRCS := $(wildcard $(GNL_DIR)/get_next_line.c $(GNL_DIR)/get_next_line_utils.c)
+    GNL_BON_SRCS := $(wildcard $(GNL_DIR)/get_next_line_bonus.c $(GNL_DIR)/get_next_line_utils_bonus.c)
 
-    # Bonus and mandatory export the same symbol: compile only one set.
-    # Prefer bonus when present (it is a superset of the mandatory behaviour).
-    ifneq ($(GNL_BONUS_C)$(GNL_BONUS_UT),)
-        GNL_USE_SRCS := $(GNL_BONUS_C) $(GNL_BONUS_UT)
-    else
-        GNL_USE_SRCS := $(GNL_MAIN_C) $(GNL_MAIN_UT)
-    endif
-
-    ifneq ($(GNL_USE_SRCS),)
+    ifneq ($(GNL_MAN_SRCS)$(GNL_BON_SRCS),)
+        # `make re BUFFER_SIZE=1` (or `make gnl-sizes`) to test other values.
         BUFFER_SIZE  ?= 42
-        CFLAGS       += -DWITH_GNL -DBUFFER_SIZE=$(BUFFER_SIZE)
-        INCLUDES     += -I $(GNL_DIR)
+        GNL_BS_STAMP  = .gnl_bs_$(BUFFER_SIZE)
+        GNL_CFLAGS    = -DBUFFER_SIZE=$(BUFFER_SIZE) -I $(GNL_DIR)
+        CFLAGS       += -DWITH_GNL -DGNL_PATH='"$(abspath $(GNL_DIR))"'
+
+        # Mandatory and bonus both define get_next_line (and often the same
+        # helpers): each set is linked into one object that only exports its
+        # get_next_line, the bonus one renamed get_next_line_bonus, so both
+        # are tested in the same binary. The objects stay in obj/gnl, not in
+        # the project directory.
+        GNL_MAN_OBJS  = $(patsubst $(GNL_DIR)/%.c,obj/gnl/mandatory/%.o,$(GNL_MAN_SRCS))
+        GNL_BON_OBJS  = $(patsubst $(GNL_DIR)/%.c,obj/gnl/bonus/%.o,$(GNL_BON_SRCS))
+        GNL_OBJS      = $(if $(GNL_MAN_SRCS),obj/gnl/gnl_mandatory.o) \
+                        $(if $(GNL_BON_SRCS),obj/gnl/gnl_bonus.o)
 
         # TEST TO ADD HERE IF NECESSARY
-        SRCS         += $(GNL_USE_SRCS) \
-                        tests/gnl/registry.c \
+        GNL_TEST_SRCS = tests/gnl/registry.c \
                         tests/gnl/gnl_utils.c \
                         tests/gnl/test_gnl.c \
                         tests/gnl/test_gnl_lines.c \
-                        tests/gnl/test_gnl_edge.c
-
-        ifneq ($(GNL_BONUS_C)$(GNL_BONUS_UT),)
-            CFLAGS   += -DWITH_GNL_BONUS
-            SRCS     += tests/gnl/test_gnl_bonus.c
-        endif
+                        tests/gnl/test_gnl_edge.c \
+                        tests/gnl/test_gnl_sizes.c \
+                        tests/gnl/test_gnl_sources.c \
+                        tests/gnl/test_gnl_memory.c \
+                        tests/gnl/test_gnl_project.c \
+                        tests/gnl/test_gnl_bonus.c
+        SRCS         += $(GNL_TEST_SRCS)
     endif
 endif
 
@@ -211,7 +213,7 @@ endif
 
 
 
-OBJS        = $(SRCS:.c=.o)
+OBJS        = $(SRCS:.c=.o) $(GNL_OBJS)
 
 # ── memory checking ─────────────────────────────────────────────────────────
 # Linux: route malloc/calloc/free through src/memcheck.c (leak and
@@ -270,6 +272,7 @@ $(MODE_STAMP):
 	$(PRINTF_FCLEAN)
     #$(OTHER_FCLEAN)
 	@rm -f $(OBJS) $(NAME)
+	@rm -rf obj
 	@touch $@
 
 asan:
@@ -285,11 +288,54 @@ valgrind:
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+ifneq ($(GNL_OBJS),)
+# Rebuild the GNL objects (and their tests) when BUFFER_SIZE changes.
+$(GNL_BS_STAMP):
+	@rm -f .gnl_bs_*
+	@touch $@
+
+$(GNL_TEST_SRCS:.c=.o): CFLAGS += -DBUFFER_SIZE=$(BUFFER_SIZE)
+$(GNL_TEST_SRCS:.c=.o): $(GNL_BS_STAMP)
+
+obj/gnl/mandatory/%.o: $(GNL_DIR)/%.c $(GNL_BS_STAMP)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(GNL_CFLAGS) -c $< -o $@
+
+obj/gnl/bonus/%.o: $(GNL_DIR)/%.c $(GNL_BS_STAMP)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(GNL_CFLAGS) -Dget_next_line=get_next_line_bonus -c $< -o $@
+
+# $(call gnl_link,exported symbol): every other symbol of the set becomes local.
+ifeq ($(UNAME_S),Darwin)
+gnl_link = ld -r -exported_symbol _$(1) -o $@ $^
+else
+gnl_link = ld -r -o $@.tmp $^ && objcopy --keep-global-symbol=$(1) $@.tmp $@ \
+	&& rm -f $@.tmp
+endif
+
+obj/gnl/gnl_mandatory.o: $(GNL_MAN_OBJS)
+	$(call gnl_link,get_next_line)
+
+obj/gnl/gnl_bonus.o: $(GNL_BON_OBJS)
+	$(call gnl_link,get_next_line_bonus)
+endif
+
+# `make gnl-sizes`: run the GNL suites with the buffer sizes the subject asks
+# about ("Does your function still work if the BUFFER_SIZE value is 9999? If
+# it is 1? 10000000?").
+gnl-sizes:
+	@for bs in 1 42 9999 10000000; do \
+		printf "\n──────────── BUFFER_SIZE=%s ────────────\n" $$bs; \
+		$(MAKE) --no-print-directory BUFFER_SIZE=$$bs all >/dev/null \
+			&& ./$(NAME) gnl || exit 1; \
+	done
+
 clean:
 	rm -f $(OBJS)
+	rm -rf obj
 
 fclean: clean
-	rm -f $(NAME) .build_mode_*
+	rm -f $(NAME) .build_mode_* .gnl_bs_*
 	$(LIBFT_FCLEAN)
 	$(PRINTF_FCLEAN)
     #$(OTHER_FCLEAN)
@@ -298,4 +344,4 @@ re: fclean all
 
 FORCE:
 
-.PHONY: all clean fclean re asan valgrind FORCE
+.PHONY: all clean fclean re asan valgrind gnl-sizes FORCE

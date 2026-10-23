@@ -10,8 +10,6 @@ t_project	*get_printf_original_project(void);
 #endif
 #ifdef WITH_GNL
 t_project	*get_gnl_project(void);
-#endif
-#ifdef WITH_GNL_BONUS
 t_project	*get_gnl_bonus_project(void);
 #endif
 
@@ -32,8 +30,6 @@ t_project	**get_all_projects(int *count)
 #endif
 #ifdef WITH_GNL
 	g_projects[i++] = get_gnl_project();
-#endif
-#ifdef WITH_GNL_BONUS
 	g_projects[i++] = get_gnl_bonus_project();
 #endif
 	*count = i;

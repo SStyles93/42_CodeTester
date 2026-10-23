@@ -22,27 +22,27 @@ void	test_gnl_two_fd(t_ctx *ctx)
 		return ;
 	}
 
-	line = get_next_line(fd1);
+	line = g_gnl(fd1);
 	check_str(ctx, "fd1 call 1", "alpha\n", line);
 	free(line);
 
-	line = get_next_line(fd2);
+	line = g_gnl(fd2);
 	check_str(ctx, "fd2 call 1 (not fd1)", "uno\n", line);
 	free(line);
 
-	line = get_next_line(fd1);
+	line = g_gnl(fd1);
 	check_str(ctx, "fd1 call 2 (resumed)", "beta\n", line);
 	free(line);
 
-	line = get_next_line(fd2);
+	line = g_gnl(fd2);
 	check_str(ctx, "fd2 call 2 (resumed)", "dos\n", line);
 	free(line);
 
-	line = get_next_line(fd1);
+	line = g_gnl(fd1);
 	check_str(ctx, "fd1 EOF", NULL, line);
 	free(line);
 
-	line = get_next_line(fd2);
+	line = g_gnl(fd2);
 	check_str(ctx, "fd2 EOF", NULL, line);
 	free(line);
 
@@ -75,36 +75,36 @@ void	test_gnl_three_fd(t_ctx *ctx)
 		return ;
 	}
 
-	line = get_next_line(fd1);
+	line = g_gnl(fd1);
 	check_str(ctx, "fd1 call 1", "line_A\n", line);
 	free(line);
 
-	line = get_next_line(fd2);
+	line = g_gnl(fd2);
 	check_str(ctx, "fd2 call 1", "line_C\n", line);
 	free(line);
 
-	line = get_next_line(fd3);
+	line = g_gnl(fd3);
 	check_str(ctx, "fd3 call 1", "line_E\n", line);
 	free(line);
 
 	/* fd3 is now exhausted; fd1 and fd2 must still have their second lines */
-	line = get_next_line(fd1);
+	line = g_gnl(fd1);
 	check_str(ctx, "fd1 call 2 (after fd3 EOF)", "line_B\n", line);
 	free(line);
 
-	line = get_next_line(fd2);
+	line = g_gnl(fd2);
 	check_str(ctx, "fd2 call 2 (after fd3 EOF)", "line_D\n", line);
 	free(line);
 
-	line = get_next_line(fd3);
+	line = g_gnl(fd3);
 	check_str(ctx, "fd3 call 2 → NULL", NULL, line);
 	free(line);
 
-	line = get_next_line(fd1);
+	line = g_gnl(fd1);
 	check_str(ctx, "fd1 call 3 → NULL", NULL, line);
 	free(line);
 
-	line = get_next_line(fd2);
+	line = g_gnl(fd2);
 	check_str(ctx, "fd2 call 3 → NULL", NULL, line);
 	free(line);
 

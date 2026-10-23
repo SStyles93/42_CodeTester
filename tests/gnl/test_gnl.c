@@ -10,7 +10,7 @@ void	test_get_next_line(t_ctx *ctx)
 	int		fd;
 
 	/* invalid fd must return NULL without crashing */
-	line = get_next_line(-1);
+	line = g_gnl(-1);
 	check_str(ctx, "fd=-1 → NULL", NULL, line);
 	free(line);
 
@@ -18,7 +18,7 @@ void	test_get_next_line(t_ctx *ctx)
 	fd = gnl_open_pipe("");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "empty input → NULL", NULL, line);
 		free(line);
 		close(fd);
@@ -28,10 +28,10 @@ void	test_get_next_line(t_ctx *ctx)
 	fd = gnl_open_pipe("hello\n");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "\"hello\\n\" call 1", "hello\n", line);
 		free(line);
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "\"hello\\n\" call 2 → NULL", NULL, line);
 		free(line);
 		close(fd);
@@ -41,10 +41,10 @@ void	test_get_next_line(t_ctx *ctx)
 	fd = gnl_open_pipe("hello");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "\"hello\" (no \\n) call 1", "hello", line);
 		free(line);
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "\"hello\" call 2 → NULL", NULL, line);
 		free(line);
 		close(fd);
@@ -54,10 +54,10 @@ void	test_get_next_line(t_ctx *ctx)
 	fd = gnl_open_pipe("\n");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "\"\\n\" call 1", "\n", line);
 		free(line);
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "\"\\n\" call 2 → NULL", NULL, line);
 		free(line);
 		close(fd);
@@ -67,7 +67,7 @@ void	test_get_next_line(t_ctx *ctx)
 	fd = gnl_open_pipe("  hello\t42  \n");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "spaces/tabs preserved", "  hello\t42  \n", line);
 		free(line);
 		gnl_drain(fd);

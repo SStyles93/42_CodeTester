@@ -1,3 +1,5 @@
 *.o
 *.a
 .build_mode_*
+.gnl_bs_*
+obj/

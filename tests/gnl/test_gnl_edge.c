@@ -14,10 +14,10 @@ void	test_gnl_edge(t_ctx *ctx)
 	fd = gnl_open_pipe("\nhello\n");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "leading \\n call 1", "\n", line);
 		free(line);
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "leading \\n call 2", "hello\n", line);
 		free(line);
 		gnl_drain(fd);
@@ -28,7 +28,7 @@ void	test_gnl_edge(t_ctx *ctx)
 	fd = gnl_open_pipe("x\n");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "single-char + \\n", "x\n", line);
 		free(line);
 		gnl_drain(fd);
@@ -39,7 +39,7 @@ void	test_gnl_edge(t_ctx *ctx)
 	fd = gnl_open_pipe("z");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "single-char no \\n", "z", line);
 		free(line);
 		gnl_drain(fd);
@@ -69,7 +69,7 @@ void	test_gnl_edge(t_ctx *ctx)
 			fd = gnl_open_pipe(big);
 			if (fd >= 0)
 			{
-				line = get_next_line(fd);
+				line = g_gnl(fd);
 				check_str(ctx, "2048-char line (> BUFFER_SIZE)", expected, line);
 				free(line);
 				gnl_drain(fd);
@@ -84,10 +84,10 @@ void	test_gnl_edge(t_ctx *ctx)
 	fd = gnl_open_pipe("last\n");
 	if (fd >= 0)
 	{
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "line+\\n then EOF call 1", "last\n", line);
 		free(line);
-		line = get_next_line(fd);
+		line = g_gnl(fd);
 		check_str(ctx, "line+\\n then EOF call 2 → NULL", NULL, line);
 		free(line);
 		close(fd);
