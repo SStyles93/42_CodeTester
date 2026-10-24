@@ -7,26 +7,10 @@ static void	t_memcmp(t_ctx *ctx, const char *label,
 {
 	int	ref;
 	int	got;
-	int	rsign;
-	int	gsign;
 
 	ref = memcmp(s1, s2, n);
 	got = ft_memcmp(s1, s2, n);
-	rsign = (ref > 0) - (ref < 0);
-	gsign = (got > 0) - (got < 0);
-	if (rsign == gsign)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s\n", label);
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s: expected sign %d, got sign %d"
-				" (ref=%d, got=%d)\n", label, rsign, gsign, ref, got);
-	}
+	check_sign(ctx, label, ref, got);
 }
 
 void	test_ft_memcmp(t_ctx *ctx)
@@ -37,7 +21,7 @@ void	test_ft_memcmp(t_ctx *ctx)
 	t_memcmp(ctx, "equal", "hello", "hello", 5);
 	t_memcmp(ctx, "s1 < s2", "abc", "abd", 3);
 	t_memcmp(ctx, "s1 > s2", "abd", "abc", 3);
-	t_memcmp(ctx, "n=0 → 0", "abc", "xyz", 0);
+	t_memcmp(ctx, "n=0", "abc", "xyz", 0);
 	/* equal first n bytes, differ after */
 	t_memcmp(ctx, "equal n bytes, differ after n", "abcXXX", "abcYYY", 3);
 	/* must not stop at 0x00, and must compare as unsigned (0xFF > 0x00) */

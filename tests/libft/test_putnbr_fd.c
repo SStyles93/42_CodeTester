@@ -2,14 +2,6 @@
 #include <string.h>
 #include <limits.h>
 
-/*
-** NOTES on ft_putnbr_fd.c:
-**   - Implementation is logically correct.
-**   - The recursive call passes 'nbr/10' (unsigned int) to a parameter
-**     declared as 'int' — implicit conversion, safe for values that fit.
-**   - '#include "libft.h"' needs the Libft directory on the include path.
-*/
-
 #include "../../include/weak_functions.h"
 
 static void	t_putnbr(t_ctx *ctx, const char *label, int n, const char *expected)
@@ -20,7 +12,7 @@ static void	t_putnbr(t_ctx *ctx, const char *label, int n, const char *expected)
 
 	if (pipe(pfd) < 0)
 	{
-		ctx->fail++;
+		check_ok(ctx, label, 0, "pipe() failed");
 		return ;
 	}
 	ft_putnbr_fd(n, pfd[1]);

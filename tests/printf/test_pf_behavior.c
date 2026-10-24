@@ -32,7 +32,8 @@ static void	unbuffered(t_ctx *ctx)
 
 	if (pf_capture_begin(&cap) != 0)
 	{
-		ctx->fail++;
+		check_ok(ctx, "interleaved write()/ft_printf", 0,
+			"could not capture stdout");
 		return ;
 	}
 	write(STDOUT_FILENO, "A", 1);
@@ -96,7 +97,7 @@ static int	pf_failing_call(int fail_at, int *leaks)
 	mem_begin(fail_at);
 	r = ft_printf("%c|%s|%p|%d|%i|%u|%x|%X|%%|%s|%p",
 			'c', "str", (void *)&cap, INT_MIN, INT_MAX, UINT_MAX, 0xabcu,
-			0xabcu, NULL, NULL);
+			0xabcu, "", NULL);
 	*leaks = mem_end();
 	pf_capture_end(&cap, g_pf_got, PF_BUF_SIZE);
 	return (r);
@@ -110,7 +111,7 @@ static void	memory(t_ctx *ctx)
 	int		expected;
 	int		i;
 	int		r;
-	char	label[64];
+	char	label[96];
 
 	if (!mem_available())
 	{
@@ -121,27 +122,25 @@ static void	memory(t_ctx *ctx)
 	}
 	if (pf_capture_begin(&cap) != 0)
 	{
-		ctx->fail++;
+		check_ok(ctx, "no leaked allocation", 0, "could not capture stdout");
 		return ;
 	}
 	mem_begin(0);
 	expected = ft_printf("%c|%s|%p|%d|%i|%u|%x|%X|%%|%s|%p",
 			'c', "str", (void *)&cap, INT_MIN, INT_MAX, UINT_MAX, 0xabcu,
-			0xabcu, NULL, NULL);
-	ft_printf("%s", (char *)NULL);
+			0xabcu, "", NULL);
 	ft_printf("%c%c", '\0', 'x');
 	allocs = mem_alloc_count();
 	leaks = mem_end();
 	pf_capture_end(&cap, g_pf_got, PF_BUF_SIZE);
-	check_int(ctx, "no leaked allocation", 0, leaks);
-	if (ctx->verbose)
-		printf(DIM "        (ft_printf made %d allocation(s))" RESET "\n",
-			allocs);
+	snprintf(label, sizeof(label), "no leaked allocation (%d allocation(s)"
+		" made)", allocs);
+	check_int(ctx, label, 0, leaks);
 	i = 1;
 	while (i <= allocs)
 	{
 		r = pf_failing_call(i, &leaks);
-		snprintf(label, sizeof(label), "malloc #%d fails: returns -1 or ok", i);
+		snprintf(label, sizeof(label), "malloc #%d fails: returns -1 or the full output", i);
 		check_bool(ctx, label, 1, r == -1 || r == expected);
 		snprintf(label, sizeof(label), "malloc #%d fails: no leak", i);
 		check_int(ctx, label, 0, leaks);

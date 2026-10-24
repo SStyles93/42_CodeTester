@@ -21,59 +21,40 @@ static void	to_upper_cb(unsigned int i, char *c)
 		*c -= 32;
 }
 
+/* "0,1,2" from the indices record() received. */
+static const char	*join_indices(char *buf, size_t size)
+{
+	size_t	len;
+	int		i;
+
+	buf[0] = '\0';
+	i = 0;
+	while (i < g_call_count && i < 32)
+	{
+		len = strlen(buf);
+		snprintf(buf + len, size - len, i ? ",%u" : "%u", g_indices[i]);
+		i++;
+	}
+	return (buf);
+}
+
 void	test_ft_striteri(t_ctx *ctx)
 {
 	char		buf[64];
+	char		idx[256];
 
 	/* in-place edit: only letters should change */
 	strcpy(buf, "a1b2c3");
 	ft_striteri(buf, to_upper_cb);
-	check_str(ctx, "striteri mixed(\"a1b2c3\")", "A1B2C3", buf);
+	check_str(ctx, "striteri(\"a1b2c3\", to_upper)", "A1B2C3", buf);
 
 	/* all indices 0-based: 0,1,2,3,4 for "hello" */
 	strcpy(buf, "hello");
 	g_call_count = 0;
 	ft_striteri(buf, record);
-	if (g_call_count == 5)
-	{
-		int	ok;
-		int	j;
+	check_str(ctx, "striteri(\"hello\"): indices received", "0,1,2,3,4",
+		join_indices(idx, sizeof(idx)));
 
-		ok = 1;
-		j = 0;
-		while (j < 5)
-		{
-			if (g_indices[j] != (unsigned int)j)
-			{
-				ok = 0;
-				break ;
-			}
-			j++;
-		}
-		if (ok)
-		{
-			ctx->pass++;
-			if (ctx->verbose)
-				printf("    " GREEN "✓" RESET
-					" striteri: all indices 0-4 in order\n");
-		}
-		else
-		{
-			ctx->fail++;
-			if (ctx->verbose)
-				printf("    " RED "✗" RESET
-					" striteri: indices out of order\n");
-		}
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET
-				" striteri: expected 5 calls, got %d\n", g_call_count);
-	}
-
-	/* empty string — must not crash */
 	strcpy(buf, "");
 	ft_striteri(buf, to_upper_cb);
 	check_str(ctx, "striteri(\"\") unchanged", "", buf);

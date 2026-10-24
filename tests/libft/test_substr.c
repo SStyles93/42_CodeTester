@@ -38,6 +38,6 @@ void	test_ft_substr(t_ctx *ctx)
 
 	/* start = UINT_MAX → start + len overflows if done naively */
 	r = ft_substr("hello", (unsigned int)-1, 5);
-	check_str(ctx, "substr(UINT_MAX,5)", "", r);
+	check_str(ctx, "substr(\"hello\",UINT_MAX,5)", "", r);
 	free(r);
 }

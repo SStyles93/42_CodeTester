@@ -1,11 +1,5 @@
 #include "../../include/tester.h"
 
-/*
-** NOTE: Your ft_memchr.c defines the function as 'memchr' instead of
-** 'ft_memchr'. Rename it to 'ft_memchr' and update libft.h accordingly.
-** Until fixed, this test file will fail to link (undefined reference).
-*/
-
 #include "../../include/weak_functions.h"
 
 static void	*ref_memchr(const void *s, int c, size_t n)
@@ -27,42 +21,10 @@ static void	t_memchr(t_ctx *ctx, const char *label,
 {
 	void		*ref;
 	void		*got;
-	ptrdiff_t	roff;
-	ptrdiff_t	goff;
 
 	ref = ref_memchr(s, c, n);
 	got = ft_memchr(s, c, n);
-	if (ref == NULL && got == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s (NULL)\n", label);
-	}
-	else if (ref == NULL || got == NULL)
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s: expected %s, got %s\n",
-				label, ref ? "ptr" : "NULL", got ? "ptr" : "NULL");
-	}
-	else
-	{
-		roff = (const unsigned char *)ref - (const unsigned char *)s;
-		goff = (const unsigned char *)got - (const unsigned char *)s;
-		if (roff == goff)
-		{
-			ctx->pass++;
-			if (ctx->verbose)
-				printf("    " GREEN "✓" RESET " %s (offset %ld)\n", label, (long)roff);
-		}
-		else
-		{
-			ctx->fail++;
-			if (ctx->verbose)
-				printf("    " RED "✗" RESET " %s: expected offset %ld, got %ld\n",
-					label, (long)roff, (long)goff);
-		}
-	}
+	check_offset(ctx, label, s, ref, got);
 }
 
 void	test_ft_memchr(t_ctx *ctx)
@@ -77,7 +39,7 @@ void	test_ft_memchr(t_ctx *ctx)
 	t_memchr(ctx, "find char at pos n-1", "abcde", 'e', 5);
 	/* search range shorter than string: char at pos n is not found */
 	t_memchr(ctx, "char just past n not found", "abcde", 'e', 4);
-	t_memchr(ctx, "n=0 → NULL", s, 'H', 0);
+	t_memchr(ctx, "n=0", s, 'H', 0);
 	t_memchr(ctx, "binary: 0x00 at offset 0", bin, 0x00, 4);
 	t_memchr(ctx, "binary: 0xFF at offset 2", bin, 0xFF, 4);
 	t_memchr(ctx, "binary: not found", bin, 0xAB, 4);

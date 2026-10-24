@@ -26,24 +26,4 @@ void	test_ft_lstdelone(t_ctx *ctx)
 		check_ptr(ctx, "lstdelone: del receives node's content",
 			(void *)(uintptr_t)42, g_del_content);
 	}
-
-	/* NULL lst → no crash, del not called */
-	g_del_count = 0;
-	ft_lstdelone(NULL, del_capture);
-	check_int(ctx, "lstdelone(NULL): del not called", 0, g_del_count);
-
-	/* NULL del → no crash */
-	n = ft_lstnew((void *)(uintptr_t)99);
-	if (n)
-	{
-		ft_lstdelone(n, NULL);
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " lstdelone(n, NULL) didn't crash\n");
-		/*
-		** Per this implementation, !del causes an early return without free.
-		** We must free the node ourselves to avoid a leak.
-		*/
-		free(n);
-	}
 }

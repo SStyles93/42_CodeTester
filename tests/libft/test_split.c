@@ -15,78 +15,33 @@ static void	free_split(char **arr)
 	free(arr);
 }
 
+/* Checks got[0..count-1] against expected, then got[count] == NULL. */
 static void	check_split(t_ctx *ctx, const char *label,
 	char **got, const char **expected, int expected_count)
 {
-	int	i;
+	char	item[128];
+	int		i;
 
 	if (!got)
 	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s → got NULL array\n", label);
+		report_fail(ctx, label, "an array", "NULL");
 		return ;
 	}
 	i = 0;
-	while (i < expected_count)
+	while (i <= expected_count)
 	{
+		snprintf(item, sizeof(item), "%s[%d]", label, i);
+		check_str(ctx, item, i < expected_count ? expected[i] : NULL, got[i]);
 		if (!got[i])
-		{
-			ctx->fail++;
-			if (ctx->verbose)
-				printf("    " RED "✗" RESET " %s[%d]: expected \"%s\", got NULL\n",
-					label, i, expected[i]);
-			free_split(got);
-			return ;
-		}
-		if (strcmp(got[i], expected[i]) == 0)
-		{
-			ctx->pass++;
-			if (ctx->verbose)
-				printf("    " GREEN "✓" RESET " %s[%d] = \"%s\"\n",
-					label, i, got[i]);
-		}
-		else
-		{
-			ctx->fail++;
-			if (ctx->verbose)
-				printf("    " RED "✗" RESET " %s[%d]: expected \"%s\", got \"%s\"\n",
-					label, i, expected[i], got[i]);
-		}
+			break ;
 		i++;
-	}
-	/* NULL sentinel at end */
-	if (got[expected_count] == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s: NULL-terminated\n", label);
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s: missing NULL terminator\n", label);
 	}
 	free_split(got);
 }
 
 static void	check_split_empty(t_ctx *ctx, const char *label, char **got)
 {
-	if (got && got[0] == NULL)
-	{
-		ctx->pass++;
-		if (ctx->verbose)
-			printf("    " GREEN "✓" RESET " %s → empty array\n", label);
-		free(got);
-	}
-	else
-	{
-		ctx->fail++;
-		if (ctx->verbose)
-			printf("    " RED "✗" RESET " %s → expected empty array\n", label);
-		free_split(got);
-	}
+	check_split(ctx, label, got, NULL, 0);
 }
 
 void	test_ft_split(t_ctx *ctx)
@@ -116,7 +71,28 @@ void	test_ft_split(t_ctx *ctx)
 	/* multiple consecutive separators */
 	check_split(ctx, "split(\"one   two\",' ')", ft_split("one   two", ' '), exp2, 2);
 
-	/* '\0' separator: never matches inside the string → whole string */
-	check_split(ctx, "split(\"hello\",'\\0')", ft_split("hello", '\0'), exp1, 1);
+	/*
+	** '\0' as separator: '\0' is the string terminator, so it is never
+	** encountered inside a valid C string. No separator is found and the
+	** whole string is returned as a single word.
+	** Buggy inner scan loops written as:
+	**   while (s[i] != c)          <- no null-guard
+	** exit at the NUL terminator (since '\0' == c), but then the outer
+	** loop increments i past the end of the string and reads garbage
+	** memory, causing a segfault.
+	** The correct form is: while (s[i] && s[i] != c)
+	*/
+	{
+		const char	*exp_nul[] = {"hello"};
+
+		check_split(ctx, "split(\"hello\",'\\0')",
+			ft_split("hello", '\0'), exp_nul, 1);
+	}
+	{
+		const char	*exp_nul2[] = {"a b c"};
+
+		check_split(ctx, "split(\"a b c\",'\\0')",
+			ft_split("a b c", '\0'), exp_nul2, 1);
+	}
 	check_split_empty(ctx, "split(\"\",'\\0')", ft_split("", '\0'));
 }

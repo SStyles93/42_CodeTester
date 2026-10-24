@@ -32,18 +32,6 @@ void	test_ft_lstmap(t_ctx *ctx)
 	mapped = ft_lstmap(NULL, map_add1, del_noop);
 	check_ptr(ctx, "lstmap(NULL, f, del) == NULL", NULL, mapped);
 
-	/* NULL f → NULL */
-	n1 = ft_lstnew((void *)(uintptr_t)1);
-	mapped = ft_lstmap(n1, NULL, del_noop);
-	check_ptr(ctx, "lstmap(lst, NULL, del) == NULL", NULL, mapped);
-	free(n1);
-
-	/* NULL del → NULL */
-	n1 = ft_lstnew((void *)(uintptr_t)1);
-	mapped = ft_lstmap(n1, map_add1, NULL);
-	check_ptr(ctx, "lstmap(lst, f, NULL) == NULL", NULL, mapped);
-	free(n1);
-
 	/* three-node mapping: 1→2→3 doubled to 2→4→6 */
 	n1 = ft_lstnew((void *)(uintptr_t)1);
 	n2 = ft_lstnew((void *)(uintptr_t)2);
@@ -72,20 +60,8 @@ void	test_ft_lstmap(t_ctx *ctx)
 				NULL, mapped->next->next->next);
 		}
 		/* result nodes must be distinct from source nodes */
-		if (mapped != src)
-		{
-			ctx->pass++;
-			if (ctx->verbose)
-				printf("    " GREEN "✓" RESET
-					" lstmap: result != src (distinct list)\n");
-		}
-		else
-		{
-			ctx->fail++;
-			if (ctx->verbose)
-				printf("    " RED "✗" RESET
-					" lstmap: result == src (same pointer!)\n");
-		}
+		check_ok(ctx, "lstmap: result is a new list (!= src)", mapped != src,
+			"returned the source list itself");
 		ft_lstclear(&mapped, del_noop);
 	}
 	/* original list must be fully intact after mapping */

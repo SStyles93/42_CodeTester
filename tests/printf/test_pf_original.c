@@ -9,7 +9,8 @@
 **
 ** original_conversions only uses the mandatory syntax (no flags/width);
 ** original_flags covers the flag cases. Cases that could crash run in
-** their own process.
+** their own process. "%s" with a NULL pointer is undefined in C (glibc
+** prints "(null)", or "" when the precision is below 6).
 */
 
 static void	isolated_no_arg(t_ctx *ctx, const void *arg)
@@ -31,13 +32,32 @@ static void	isolated_null_format(t_ctx *ctx, const void *arg)
 	(void)arg;
 	if (pf_capture_begin(&cap) != 0)
 	{
-		ctx->fail++;
+		check_ok(ctx, "ft_printf(NULL)", 0, "could not capture stdout");
 		return ;
 	}
 	r = ft_printf(NULL);
 	len = pf_capture_end(&cap, g_pf_got, PF_BUF_SIZE);
 	check_int(ctx, "ft_printf(NULL) returns -1", -1, r);
 	check_int(ctx, "ft_printf(NULL) writes nothing", 0, len);
+}
+
+static void	isolated_null_string(t_ctx *ctx, const void *arg)
+{
+	char	*null_str;
+
+	(void)arg;
+	null_str = NULL;
+	PF(ctx, "%s", null_str);
+	PF(ctx, "%s %s", null_str, "after");
+}
+
+static void	isolated_null_string_flags(t_ctx *ctx, const void *arg)
+{
+	(void)arg;
+	PF(ctx, "%10s", (char *)NULL);
+	PF(ctx, "%-10s|", (char *)NULL);
+	PF(ctx, "%.5s", (char *)NULL);
+	PF(ctx, "%.6s", (char *)NULL);
 }
 
 static void	run_formats(t_ctx *ctx, const char **fmts, size_t n)
@@ -58,6 +78,7 @@ void	test_pf_original(t_ctx *ctx)
 
 	run_formats(ctx, fmts, sizeof(fmts) / sizeof(fmts[0]));
 	run_isolated(ctx, "ft_printf(NULL)", isolated_null_format, NULL);
+	run_isolated(ctx, "\"%s\", NULL", isolated_null_string, NULL);
 }
 
 static void	flag_mismatch(t_ctx *ctx)
@@ -93,4 +114,6 @@ void	test_pf_original_flags(t_ctx *ctx)
 
 	run_formats(ctx, fmts, sizeof(fmts) / sizeof(fmts[0]));
 	flag_mismatch(ctx);
+	run_isolated(ctx, "NULL string with width/precision",
+		isolated_null_string_flags, NULL);
 }

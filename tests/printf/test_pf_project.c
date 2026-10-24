@@ -1,13 +1,15 @@
 #include "pf_tester.h"
 #include <ctype.h>
 #ifndef _WIN32
+# include <dirent.h>
 # include <strings.h>
 #endif
 
 /*
 ** Subject requirements that are not about ft_printf's output:
 **   - libftprintf.a at the root, built with ar (libtool forbidden);
-**   - ft_printf.h containing the prototype;
+**   - a header (.h at the root or one directory below) containing the
+**     prototype;
 **   - Makefile with NAME, all, clean, fclean, re (+ bonus), no relink;
 **   - only malloc, free, write (and va_*) as external functions.
 ** PRINTF_PATH (absolute path of the project) is set by the Makefile.
@@ -25,13 +27,6 @@ typedef struct s_syms
 	char	names[PF_MAX_SYMS][64];
 	int		count;
 }	t_syms;
-
-static void	pass_fail(t_ctx *ctx, const char *label, int ok, const char *why)
-{
-	check_bool(ctx, label, 1, ok);
-	if (!ok && ctx->verbose && why)
-		printf(DIM "        %s" RESET "\n", why);
-}
 
 static char	*read_file(const char *name)
 {
@@ -120,37 +115,84 @@ static int	mk_has_var(const char *mk, const char *var)
 	return (0);
 }
 
+/* name (relative to PRINTF_PATH) is a .h declaring ft_printf. */
+static int	declares_ft_printf(const char *name)
+{
+	char	*h;
+	int		i;
+	int		j;
+	int		found;
+
+	h = read_file(name);
+	if (!h)
+		return (0);
+	i = 0;
+	j = 0;
+	while (h[i])
+	{
+		if (!isspace((unsigned char)h[i]))
+			h[j++] = h[i];
+		i++;
+	}
+	h[j] = '\0';
+	found = (strstr(h, "intft_printf(constchar*") != NULL);
+	free(h);
+	return (found);
+}
+
+#ifndef _WIN32
+
+/* Every .h in dir (relative to PRINTF_PATH, "" = root) and its subdirs. */
+static void	scan_headers(const char *dir, int depth, int *headers, int *found)
+{
+	char			path[1024];
+	char			name[1024];
+	DIR				*d;
+	struct dirent	*e;
+	size_t			n;
+
+	snprintf(path, sizeof(path), "%s/%s", PRINTF_PATH, dir);
+	d = opendir(path);
+	while (d && (e = readdir(d)) != NULL)
+	{
+		if (e->d_name[0] == '.')
+			continue ;
+		snprintf(name, sizeof(name), "%s%s%s", dir, dir[0] ? "/" : "",
+			e->d_name);
+		n = strlen(e->d_name);
+		if (n > 2 && strcmp(e->d_name + n - 2, ".h") == 0)
+		{
+			(*headers)++;
+			*found |= declares_ft_printf(name);
+		}
+		else if (depth == 0)
+			scan_headers(name, 1, headers, found);
+	}
+	if (d)
+		closedir(d);
+}
+
+#endif
+
 static void	check_files(t_ctx *ctx)
 {
 	char	path[1024];
-	char	*h;
-	char	*squashed;
-	int		i;
-	int		j;
+	int		headers;
+	int		found;
 
 	snprintf(path, sizeof(path), "%s/libftprintf.a", PRINTF_PATH);
-	pass_fail(ctx, "libftprintf.a exists at the root", access(path, F_OK) == 0,
+	check_ok(ctx, "libftprintf.a exists at the root", access(path, F_OK) == 0,
 		path);
-	h = read_file("ft_printf.h");
-	pass_fail(ctx, "ft_printf.h exists at the root", h != NULL, NULL);
-	if (!h)
-		return ;
-	squashed = malloc(strlen(h) + 1);
-	i = 0;
-	j = 0;
-	while (squashed && h[i])
-	{
-		if (!isspace((unsigned char)h[i]))
-			squashed[j++] = h[i];
-		i++;
-	}
-	if (squashed)
-		squashed[j] = '\0';
-	pass_fail(ctx, "ft_printf.h declares int ft_printf(const char *, ...)",
-		squashed && strstr(squashed, "intft_printf(constchar*") != NULL,
-		"prototype not found");
-	free(squashed);
-	free(h);
+	headers = 0;
+	found = 0;
+#ifndef _WIN32
+	scan_headers("", 0, &headers, &found);
+#else
+	headers = 1;
+	found = declares_ft_printf("ft_printf.h");
+#endif
+	check_ok(ctx, "a header declares int ft_printf(const char *, ...)", found,
+		headers ? "prototype not found in any .h" : "no .h file found");
 }
 
 static void	check_makefile(t_ctx *ctx)
@@ -161,26 +203,28 @@ static void	check_makefile(t_ctx *ctx)
 	size_t				i;
 
 	mk = read_file("Makefile");
-	pass_fail(ctx, "Makefile exists at the root", mk != NULL, NULL);
+	check_ok(ctx, "Makefile exists at the root", mk != NULL, "file not found");
 	if (!mk)
 		return ;
-	pass_fail(ctx, "Makefile defines NAME", mk_has_var(mk, "NAME"), NULL);
-	pass_fail(ctx, "Makefile names the library libftprintf.a",
-		strstr(mk, "libftprintf.a") != NULL, NULL);
+	check_ok(ctx, "Makefile defines NAME", mk_has_var(mk, "NAME"),
+		"no \"NAME =\" line");
+	check_ok(ctx, "Makefile names the library libftprintf.a",
+		strstr(mk, "libftprintf.a") != NULL, "\"libftprintf.a\" not found");
 	i = 0;
 	while (i < sizeof(rules) / sizeof(rules[0]))
 	{
 		snprintf(label, sizeof(label), "Makefile has a '%s' rule", rules[i]);
-		pass_fail(ctx, label, mk_has_target(mk, rules[i]), NULL);
+		check_ok(ctx, label, mk_has_target(mk, rules[i]), "rule not found");
 		i++;
 	}
-	pass_fail(ctx, "Makefile uses ar", strstr(mk, "ar ") != NULL
-		|| strstr(mk, "ar\t") != NULL || strstr(mk, "$(AR)") != NULL, NULL);
-	pass_fail(ctx, "Makefile does not use libtool (forbidden)",
-		strstr(mk, "libtool") == NULL, NULL);
-	pass_fail(ctx, "compiles with -Wall -Wextra -Werror (42 rules)",
+	check_ok(ctx, "Makefile uses ar", strstr(mk, "ar ") != NULL
+		|| strstr(mk, "ar\t") != NULL || strstr(mk, "$(AR)") != NULL,
+		"neither \"ar\" nor $(AR) found");
+	check_ok(ctx, "Makefile does not use libtool (forbidden)",
+		strstr(mk, "libtool") == NULL, "libtool found");
+	check_ok(ctx, "Makefile uses -Wall -Wextra -Werror",
 		strstr(mk, "-Wall") && strstr(mk, "-Wextra") && strstr(mk, "-Werror"),
-		NULL);
+		"at least one of the flags is missing");
 	free(mk);
 }
 
@@ -231,11 +275,11 @@ static void	check_relink(t_ctx *ctx, const char *rule)
 		rule[0] ? " " : "", rule);
 	if (run_cmd(cmd, out, sizeof(out)) != 0)
 	{
-		pass_fail(ctx, label, 0, "make failed");
+		check_ok(ctx, label, 0, "make failed");
 		return ;
 	}
 	bad = find_build_line(out, line, sizeof(line));
-	pass_fail(ctx, label, bad == NULL, bad);
+	check_ok(ctx, label, bad == NULL, bad);
 }
 
 static int	sym_has(const t_syms *s, const char *name)
@@ -335,13 +379,13 @@ static void	check_external_functions(t_ctx *ctx)
 		{
 			snprintf(label, sizeof(label), "forbidden external function: %s",
 				undef.names[i]);
-			pass_fail(ctx, label, 0, "authorized: malloc, free, write, va_*");
+			check_ok(ctx, label, 0, "authorized: malloc, free, write, va_*");
 			forbidden++;
 		}
 		i++;
 	}
 	if (!forbidden)
-		pass_fail(ctx, "only authorized external functions"
+		check_ok(ctx, "only authorized external functions"
 			" (malloc, free, write, va_*)", 1, NULL);
 }
 
@@ -363,8 +407,8 @@ void	test_pf_bonus_project(t_ctx *ctx)
 	char	*mk;
 
 	mk = read_file("Makefile");
-	pass_fail(ctx, "Makefile has a 'bonus' rule (42 rules)",
-		mk && mk_has_target(mk, "bonus"), NULL);
+	check_ok(ctx, "Makefile has a 'bonus' rule (42 rules)",
+		mk && mk_has_target(mk, "bonus"), "rule not found");
 	free(mk);
 #ifndef _WIN32
 	check_relink(ctx, "bonus");

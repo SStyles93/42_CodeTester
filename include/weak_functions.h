@@ -57,4 +57,9 @@ __attribute__((weak)) t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (
 /* ── ft_printf ── */
 __attribute__((weak)) int			ft_printf(const char *format, ...);
 
+/* ── GNL ── */
+__attribute__((weak)) char			*get_next_line(int fd);
+/* the bonus get_next_line, renamed by the Makefile */
+__attribute__((weak)) char			*get_next_line_bonus(int fd);
+
 #endif
