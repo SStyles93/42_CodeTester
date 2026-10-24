@@ -246,7 +246,7 @@ all: $(NAME)
 $(NAME): $(MODE_STAMP) $(LINK_DEPS) $(OBJS)
 	$(CC) $(OBJS) $(LINK_LIBS) $(LFLAGS) -o $(NAME)
 	@echo "\n────────────────────────────────────────────────" \
-	"\n    Build complete. Run with: $(GREEN)./tester$(NC)" \
+	"\n    Build complete. Run with: $(GREEN)make run$(NC) or $(GREEN)./$(NAME)$(NC)" \
 	"\n────────────────────────────────────────────────\n"
     
 
@@ -274,6 +274,11 @@ $(MODE_STAMP):
 	@rm -f $(OBJS) $(NAME)
 	@rm -rf obj
 	@touch $@
+
+# `make run` builds if needed, then runs the tester.
+# Extra arguments go through ARGS: make run ARGS="-v printf"
+run: all
+	./$(NAME) $(ARGS)
 
 asan:
 	@$(MAKE) --no-print-directory SANITIZE=1 all
@@ -344,4 +349,4 @@ re: fclean all
 
 FORCE:
 
-.PHONY: all clean fclean re asan valgrind gnl-sizes FORCE
+.PHONY: all clean fclean re run asan valgrind gnl-sizes FORCE

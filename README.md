@@ -11,6 +11,7 @@ An interactive C tester for 42 projects.
 |---|---|---|
 | **Libft** | Full ${\color{lightgreen}\text{(including linked-list functions)}}$ | ${\color{lightgreen}\text{100/100}}$ |  
 | **Printf** | Full ${\color{lightgreen}\text{(mandatory + bonus + original printf behaviour)}}$ | ${\color{red}\text{N}}$ |
+| **Get_next_line** | Full ${\color{lightgreen}\text{(mandatory + bonus)}}$ | ${\color{red}\text{N}}$ |
 
 
 ## Features
@@ -19,13 +20,14 @@ An interactive C tester for 42 projects.
 - **Crash isolation** — each suite runs in a forked child process; a segfault or infinite loop only kills that suite, not the whole run
 - **Timeout detection** — tests that hang are killed after a configurable deadline (default 10 s)
 - **Malloc-failure testing** — `memcheck` wraps `malloc`/`calloc`/`free` to inject allocation failures and verify your code handles them gracefully ${\color{orange}\text{(Linux only)}}$
-- **AddressSanitizer + UBSan** — `make asan` recompiles everything with sanitizers and runs the full suite ${\color{orange}\text{(Linux and macOS)}}$
+- **AddressSanitizer + UBSan** — `make asan` recompiles the tester, libft and get_next_line with sanitizers and runs the full suite ${\color{orange}\text{(Linux and macOS)}}$
 - **Valgrind** — `make valgrind` runs under Valgrind with full leak checking ${\color{orange}\text{(Linux only)}}$
 - **Cross-platform** — builds on Linux, macOS, and Windows (native or WSL/MinGW)
 - **Auto-detection** — the Makefile finds sibling project directories automatically (case-insensitive: `libft`, `Libft`, `LIBFT`, etc.) and only compiles the suites for projects that are present
 - **Missing-function detection** — functions are declared weak, so an unimplemented one is reported as `MISSING` instead of breaking the build
 - **Compared against the real printf** — every `ft_printf` case runs `snprintf` with the same arguments and compares the bytes written to stdout and the return value
-- **Subject checks** — Makefile rules, relinking, library/header names, forbidden external functions and the README format required by the subject
+- **Subject checks** — Makefile rules, relinking, library/header names, compilation flags, forbidden external functions, global/static variables and the README format required by the subject
+- **Mandatory and bonus side by side** — get_next_line's mandatory and bonus files are compiled into the same binary and tested independently
 - **Informational categories** — behaviour the subject does not require (e.g. what the original printf does with `%k`) is reported without counting as a failure
 
 ## Requirements
@@ -38,20 +40,23 @@ An interactive C tester for 42 projects.
 | `valgrind` | Optional — ${\color{orange}\text{Linux only}}$, for `make valgrind` |
 | ASan-capable compiler | Optional — ${\color{orange}\text{Linux and macOS}}$, for `make asan` |
 
-The tester auto-detects your project directories as siblings of this repo (e.g. `../libft`, `../printf`). It builds the relevant library (`libft.a`, `libftprintf.a`) automatically before linking, by running your project's own Makefile.
+The tester auto-detects your project directories as siblings of this repo (e.g. `../libft`, `../printf`, `../get_next_line`). It builds the relevant library (`libft.a`, `libftprintf.a`) automatically before linking, by running your project's own Makefile. get_next_line has no Makefile: its `.c` files are compiled directly by the tester (objects go to `obj/gnl/`, your directory is left untouched).
 
 ## Building
 
-Your project directories must be **siblings** of `CodeTester` — the Makefile finds them automatically. Any combination works (only libft, only printf, or both):
+Your project directories must be **siblings** of `CodeTester` — the Makefile finds them automatically. Any combination works (only libft, only printf, only get_next_line, or several):
 
 ```
 parent/
 ├── CodeTester/
 ├── libft/          ← auto-detected (libft.a)
-└── printf/         ← auto-detected (libftprintf.a)
+├── printf/         ← auto-detected (libftprintf.a)
+└── get_next_line/  ← auto-detected (also gnl/, GNL/, Get_next_line/)
 ```
 
 > **Printf:** `libftprintf.a` must contain real object files. If your printf uses libft, copy `libft.a` and add your objects to it (`cp $(LIBFT) $(NAME)` then `ar rcs $(NAME) $(OBJS)`). Passing `libft.a` itself to `ar` stores it as a nested archive, which the linker cannot use.
+
+> **Get_next_line:** the tester looks for `get_next_line.c` / `get_next_line_utils.c` (mandatory) and `get_next_line_bonus.c` / `get_next_line_utils_bonus.c` (bonus). Either set alone is enough. `BUFFER_SIZE` defaults to 42.
 
 ### ${\color{lightgreen}\text{macOS}}$ — fully supported
 
@@ -96,10 +101,13 @@ The Makefile detects Windows and produces `tester.exe`. ${\color{red}\text{make 
 
 ```sh
 make              # build ./tester (only suites for detected projects)
+make run          # build if needed, then launch ./tester (interactive menu)
+make run ARGS="-v gnl"  # same, passing arguments to ./tester
 ./tester          # interactive menu (when stdin is a terminal)
 ./tester all      # run every suite of every detected project
 ./tester libft    # run one whole project (case-insensitive name)
 ./tester printf   # run every printf category (mandatory, bonus, original)
+./tester gnl      # run every get_next_line category (mandatory, bonus)
 ./tester printf_bonus  # run a single category
 ./tester ft_split # run a single named suite (searched in every project)
 ./tester -v printf_s   # verbose: each check, with expected/got on failure
@@ -107,6 +115,8 @@ make              # build ./tester (only suites for detected projects)
 ./tester -t 5 all # set timeout to 5 s per suite (default: 10 s)
 make asan         # build with AddressSanitizer + UBSan, then run all
 make valgrind     # build normally, then run under Valgrind (Linux)
+make re BUFFER_SIZE=1  # rebuild get_next_line with another BUFFER_SIZE
+make gnl-sizes    # run the gnl suites with BUFFER_SIZE 1, 42, 9999, 10000000
 make re           # clean rebuild
 ```
 
@@ -165,6 +175,35 @@ The suites are split into three categories, following the subject:
 
 Cases that may crash (`NULL` format, trailing `%`) run in their own process, so a crash only fails that case.
 
+### Get_next_line
+
+The mandatory files and the bonus files are compiled separately (the bonus `get_next_line` is renamed `get_next_line_bonus` at compile time), so both are linked into the same binary and the same suites run against each of them. Lines are fed through pipes and temporary regular files.
+
+**GNL_mandatory** — `get_next_line.c` / `get_next_line_utils.c`
+
+| Suite | What it covers |
+|---|---|
+| `get_next_line` | invalid fd, empty input, one line with and without a trailing `\n`, a bare `\n` |
+| `gnl_lines` | several lines, one per call, then `NULL` once the source is exhausted |
+| `gnl_edge_cases` | leading `\n`, single-character lines, lines much longer than `BUFFER_SIZE` |
+| `gnl_buffer_size` | line lengths around `BUFFER_SIZE` (rebuild with `make re BUFFER_SIZE=n` or use `make gnl-sizes`) |
+| `gnl_big_file` | a 1000-line file, bigger than a pipe can hold |
+| `gnl_read_little` | does not read the whole file at once: after the first call, the offset is not past the `read()` that found the first `\n` |
+| `gnl_sources` | regular files, standard input, non-regular fds, and the error cases that must return `NULL` |
+| `gnl_memory` | no leak once `NULL` is returned (static included), malloc-failure handling ${\color{orange}\text{(Linux)}}$ |
+| `gnl_project` | the 3 files at the root, prototype in the header, compiles with `cc -Wall -Wextra -Werror` with and without `-D BUFFER_SIZE` (1, 9999, 10000000), only `read` / `malloc` / `free` as external functions, no global variable, README first line and sections |
+
+**GNL_bonus** — `get_next_line_bonus.c` / `get_next_line_utils_bonus.c`
+
+| Suite | What it covers |
+|---|---|
+| `bonus_get_next_line` … `bonus_memory` | the same suites as the mandatory part, run on the bonus implementation |
+| `bonus_two_fd` | two fds read in alternation: each call returns the next line of the fd passed |
+| `bonus_three_fd` | three fds in rotation; exhausting one must not corrupt the others |
+| `bonus_project` | the 3 `_bonus` files, compilation, a single static variable |
+
+The compilation checks in `gnl_project` / `bonus_project` are skipped on native Windows.
+
 ## Project structure
 
 ```
@@ -183,16 +222,25 @@ CodeTester/
 │   ├── libft/
 │   │   ├── registry.c  # Registers all Libft suites
 │   │   └── test_<name>.c  # One file per Libft function
-│   └── printf/
-│       ├── registry.c  # Registers the Printf_mandatory / _bonus / _original categories
-│       ├── pf_tester.h # PF / PF_L macros: compare ft_printf with snprintf
-│       ├── pf_utils.c  # stdout capture into a temp file, result reporting
-│       ├── test_ft_printf.c, test_pf_<c|s|p|di|u|x|percent>.c  # mandatory conversions
-│       ├── test_pf_behavior.c   # buffering, write errors, memory
-│       ├── test_pf_project.c    # subject requirements (Makefile, nm, README...)
-│       ├── test_pf_minus_zero_dot.c, test_pf_hash_space_plus.c,
-│       │   test_pf_combinations.c  # bonus flags
-│       └── test_pf_original.c   # undefined behaviour vs the original printf
+│   ├── printf/
+│   │   ├── registry.c  # Registers the Printf_mandatory / _bonus / _original categories
+│   │   ├── pf_tester.h # PF / PF_L macros: compare ft_printf with snprintf
+│   │   ├── pf_utils.c  # stdout capture into a temp file, result reporting
+│   │   ├── test_ft_printf.c, test_pf_<c|s|p|di|u|x|percent>.c  # mandatory conversions
+│   │   ├── test_pf_behavior.c   # buffering, write errors, memory
+│   │   ├── test_pf_project.c    # subject requirements (Makefile, nm, README...)
+│   │   ├── test_pf_minus_zero_dot.c, test_pf_hash_space_plus.c,
+│   │   │   test_pf_combinations.c  # bonus flags
+│   │   └── test_pf_original.c   # undefined behaviour vs the original printf
+│   └── gnl/
+│       ├── registry.c  # Registers GNL_mandatory / GNL_bonus (each suite wrapped for both)
+│       ├── gnl_tester.h, gnl_utils.c  # pipe / temp-file helpers, g_gnl pointer
+│       ├── test_gnl.c, test_gnl_lines.c, test_gnl_edge.c  # line reading
+│       ├── test_gnl_sizes.c     # BUFFER_SIZE, big file, read as little as possible
+│       ├── test_gnl_sources.c   # files, stdin, error cases
+│       ├── test_gnl_memory.c    # leaks, malloc failures
+│       ├── test_gnl_project.c   # subject requirements (files, build, nm, README...)
+│       └── test_gnl_bonus.c     # several fds at once
 └── Makefile
 ```
 
@@ -297,7 +345,7 @@ Then `make re` and run `./tester ft_foo` to verify.
 
 ### Adding a new project
 
-To add tests for a completely new 42 project (e.g. `ft_printf`):
+To add tests for a completely new 42 project (e.g. `pipex`):
 
 **1. Add weak declarations to `include/weak_functions.h`**
 
@@ -370,7 +418,7 @@ t_project   *get_myproject_project(void);
 
 **4. Wire it up in the Makefile**
 
-Add a sibling-directory detection block and a conditional `SRCS +=` block following the same pattern as the existing `LIBFT_DIR` / `PRINTF_DIR` blocks.
+Add a sibling-directory detection block and a conditional `SRCS +=` block following the same pattern as the existing `LIBFT_DIR` / `PRINTF_DIR` blocks (or the commented `OTHER` template block).
 
 Because the tester only references your functions **weakly**, the linker does not pull them out of a static archive by itself. Force them in, as the existing blocks do:
 
