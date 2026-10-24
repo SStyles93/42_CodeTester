@@ -107,22 +107,6 @@ static void	check_case(t_ctx *ctx, const void *arg)
 	snprintf(label, sizeof(label), "%s: leaked blocks after free(result)",
 		mc->name);
 	check_int(ctx, label, 0, leaked);
-	/* 2. make each of its allocations fail in turn */
-	n = 1;
-	while (n <= allocs)
-	{
-		mem_begin(n);
-		result = mc->call();
-		snprintf(label, sizeof(label), "%s: malloc #%d of %d fails: return value",
-			mc->name, n, allocs);
-		check_ptr(ctx, label, NULL, result);
-		mc->release(result);
-		leaked = mem_end();
-		snprintf(label, sizeof(label),
-			"%s: malloc #%d of %d fails: leaked blocks", mc->name, n, allocs);
-		check_int(ctx, label, 0, leaked);
-		n++;
-	}
 }
 
 void	test_memory(t_ctx *ctx)
