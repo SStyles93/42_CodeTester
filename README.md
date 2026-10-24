@@ -100,9 +100,12 @@ The Makefile detects Windows and produces `tester.exe`. ${\color{red}\text{make 
 ## Usage
 
 ```sh
+== MAKE COMMANDS ==
 make              # build ./tester (only suites for detected projects)
 make run          # build if needed, then launch ./tester (interactive menu)
 make run ARGS="-v gnl"  # same, passing arguments to ./tester
+
+== EXECUTION COMMANDS ==
 ./tester          # interactive menu (when stdin is a terminal)
 ./tester all      # run every suite of every detected project
 ./tester libft    # run one whole project (case-insensitive name)
@@ -113,11 +116,17 @@ make run ARGS="-v gnl"  # same, passing arguments to ./tester
 ./tester -v printf_s   # verbose: each check, with expected/got on failure
 ./tester -v all   # verbose output — shows each individual check
 ./tester -t 5 all # set timeout to 5 s per suite (default: 10 s)
+
+== SPECIAL COMMANDS ==
 make asan         # build with AddressSanitizer + UBSan, then run all
 make valgrind     # build normally, then run under Valgrind (Linux)
 make re BUFFER_SIZE=1  # rebuild get_next_line with another BUFFER_SIZE
 make gnl-sizes    # run the gnl suites with BUFFER_SIZE 1, 42, 9999, 10000000
 make re           # clean rebuild
+
+=== CLEAN COMMANDS ==
+make clean       # clean all .o files (tester & your projects)
+make fclean      # clean all .o & .a files (tester & your projects)
 ```
 
 ## Test suites
