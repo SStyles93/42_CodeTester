@@ -39,5 +39,4 @@ void	test_ft_lstnew(t_ctx *ctx)
 			free(n);
 		}
 	}
-	/* malloc-fail path is covered by the Memory suite */
 }
