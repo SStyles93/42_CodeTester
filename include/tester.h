@@ -76,6 +76,11 @@ int		mem_end(void);
 int		mem_alloc_count(void);
 int		mem_fail_hit(void);
 
+/* read() count checker (src/readcheck.c) */
+int		read_check_available(void);
+void	read_check_begin(int fd, size_t expected);
+int		read_check_end(void);
+
 /* Runner (src/runner.c) */
 extern int	g_test_timeout;
 void	run_isolated(t_ctx *ctx, const char *label,

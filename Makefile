@@ -32,6 +32,7 @@ SRCS        = src/main.c \
               src/runner.c \
               src/utils.c \
               src/memcheck.c \
+              src/readcheck.c \
               tests/registry.c
 
 
@@ -219,8 +220,9 @@ OBJS        = $(SRCS:.c=.o) $(GNL_OBJS)
 # Linux: route malloc/calloc/free through src/memcheck.c (leak and
 # malloc-failure tests in the "memory" suite). Needs GNU ld's --wrap.
 ifeq ($(UNAME_S),Linux)
-    CFLAGS  += -DMEMCHECK_WRAP
-    LFLAGS  += -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=free
+    CFLAGS  += -DMEMCHECK_WRAP -DREADCHECK_WRAP
+    LFLAGS  += -Wl,--wrap=malloc -Wl,--wrap=calloc -Wl,--wrap=free \
+               -Wl,--wrap=read
 endif
 
 # `make asan` (or SANITIZE=1): build libft and the tester with

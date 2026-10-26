@@ -169,6 +169,38 @@ void	test_gnl_big_file(t_ctx *ctx)
 }
 
 /*
+** The subject mandates that get_next_line() calls read() with count ==
+** BUFFER_SIZE every time. We wrap read() (Linux, --wrap=read) and flag any
+** call on the same fd where the count differs.
+*/
+void	test_gnl_read_count(t_ctx *ctx)
+{
+	char	why[96];
+	char	*line;
+	int		bad;
+	int		fd;
+
+	if (!read_check_available())
+	{
+		printf("    " YELLOW "!" RESET " read-count check needs the Linux"
+			" read() wrapper (-Wl,--wrap) — skipped\n");
+		return ;
+	}
+	fd = gnl_open_file("first line\nsecond line\nthird line\n");
+	if (fd < 0)
+		return ;
+	read_check_begin(fd, BUFFER_SIZE);
+	while ((line = g_gnl(fd)) != NULL)
+		free(line);
+	bad = read_check_end();
+	snprintf(why, sizeof(why), "%d call%s used count != BUFFER_SIZE (%d)",
+		bad, bad == 1 ? "" : "s", BUFFER_SIZE);
+	check_ok(ctx, "read() is always called with count == BUFFER_SIZE",
+		bad == 0, why);
+	close(fd);
+}
+
+/*
 ** "Try to read as little as possible each time get_next_line() is called...
 ** Don't read the whole file and then process each line."
 ** After the first call, the file offset must not be past the read() that

@@ -18,6 +18,7 @@ void	test_gnl_edge(t_ctx *ctx);
 void	test_gnl_sizes(t_ctx *ctx);
 void	test_gnl_big_file(t_ctx *ctx);
 void	test_gnl_read_little(t_ctx *ctx);
+void	test_gnl_read_count(t_ctx *ctx);
 void	test_gnl_sources(t_ctx *ctx);
 void	test_gnl_memory(t_ctx *ctx);
 void	test_gnl_project(t_ctx *ctx);
@@ -46,6 +47,7 @@ GNL_WRAP(test_gnl_edge)
 GNL_WRAP(test_gnl_sizes)
 GNL_WRAP(test_gnl_big_file)
 GNL_WRAP(test_gnl_read_little)
+GNL_WRAP(test_gnl_read_count)
 GNL_WRAP(test_gnl_sources)
 GNL_WRAP(test_gnl_memory)
 GNL_WRAP_BONUS(test_gnl_two_fd)
@@ -61,6 +63,7 @@ static t_suite	g_mandatory_suites[] = {
 	MAN("gnl_buffer_size", test_gnl_sizes),
 	MAN("gnl_big_file", test_gnl_big_file),
 	MAN("gnl_read_little", test_gnl_read_little),
+	MAN("gnl_read_count", test_gnl_read_count),
 	MAN("gnl_sources", test_gnl_sources),
 	MAN("gnl_memory", test_gnl_memory),
 	{"gnl_project", test_gnl_project, NULL, 0},
@@ -73,6 +76,7 @@ static t_suite	g_bonus_suites[] = {
 	BON("bonus_buffer_size", test_gnl_sizes),
 	BON("bonus_big_file", test_gnl_big_file),
 	BON("bonus_read_little", test_gnl_read_little),
+	BON("bonus_read_count", test_gnl_read_count),
 	BON("bonus_sources", test_gnl_sources),
 	BON("bonus_memory", test_gnl_memory),
 	BON("bonus_two_fd", test_gnl_two_fd),
