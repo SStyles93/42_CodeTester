@@ -198,7 +198,7 @@ The mandatory files and the bonus files are compiled separately (the bonus `get_
 | `gnl_buffer_size` | line lengths around `BUFFER_SIZE` (rebuild with `make re BUFFER_SIZE=n` or use `make gnl-sizes`) |
 | `gnl_big_file` | a 1000-line file, bigger than a pipe can hold |
 | `gnl_read_little` | does not read the whole file at once: after the first call, the offset is not past the `read()` that found the first `\n` |
-| `gnl_sources` | regular files, standard input, non-regular fds, and the error cases that must return `NULL` |
+| `gnl_sources` | regular files, standard input, `NULL` after EOF, and the error cases that must return `NULL`: fd `-1`, an fd never opened, a closed pipe, a directory fd (`read()` fails). An fd closed mid-file is not tested: when the next line is already buffered, a correct `get_next_line` returns it without calling `read()`, so it cannot see the error |
 | `gnl_memory` | no leak once `NULL` is returned (static included), malloc-failure handling ${\color{orange}\text{(Linux)}}$ |
 | `gnl_project` | the 3 files at the root, prototype in the header, compiles with `cc -Wall -Wextra -Werror` with and without `-D BUFFER_SIZE` (1, 9999, 10000000), only `read` / `malloc` / `free` as external functions, no global variable, README first line and sections |
 

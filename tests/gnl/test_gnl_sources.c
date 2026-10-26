@@ -114,53 +114,10 @@ static void	check_invalid_fds(t_ctx *ctx)
 #endif
 }
 
-/*
-** read() error in the middle of a file: the fd is closed after one line,
-** and the next call must return NULL ("NULL if ... an error occurred").
-** Then the same file is opened again on the same fd number and must be read
-** from its first line: the static buffer has to be cleared when read()
-** fails (same check as francinette's read_error test).
-*/
-static void	check_read_error(t_ctx *ctx)
-{
-	static const char	*content = "line 1\nline 2\nline 3\n";
-	char				*line;
-	int					fd;
-	int					again;
-
-	fd = gnl_open_file(content);
-	if (fd < 0)
-		return ;
-	line = g_gnl(fd);
-	check_str(ctx, "read error: first line", "line 1\n", line);
-	free(line);
-	close(fd);
-	line = g_gnl(fd);
-	check_str(ctx, "read error: closed mid-file", NULL, line);
-	free(line);
-	again = gnl_open_file(content);
-	if (again < 0)
-		return ;
-	if (again != fd)
-	{
-		dup2(again, fd);
-		close(again);
-	}
-	line = g_gnl(fd);
-	check_str(ctx, "read error: same file reopened, call 1", "line 1\n", line);
-	free(line);
-	line = g_gnl(fd);
-	check_str(ctx, "read error: same file reopened, call 2", "line 2\n", line);
-	free(line);
-	gnl_drain(fd);
-	close(fd);
-}
-
 void	test_gnl_sources(t_ctx *ctx)
 {
 	check_regular_file(ctx);
 	check_stdin(ctx);
 	check_after_eof(ctx);
 	check_invalid_fds(ctx);
-	check_read_error(ctx);
 }
