@@ -1,9 +1,9 @@
 #include "gnl_tester.h"
 
 /*
-** Edge cases: a leading newline, a line much longer than BUFFER_SIZE, and a
-** single-character line.  These expose common off-by-one errors and incorrect
-** buffer-accumulation logic.
+	Edge cases: a leading newline, a line much longer than BUFFER_SIZE, and a
+	single-character line.  These expose common off-by-one errors and incorrect
+	buffer-accumulation logic.
 */
 void	test_gnl_edge(t_ctx *ctx)
 {
@@ -46,11 +46,11 @@ void	test_gnl_edge(t_ctx *ctx)
 		close(fd);
 	}
 
-	/*
-	** Line much longer than any typical BUFFER_SIZE (2048 'A' + newline).
-	** A correct implementation must keep reading until it finds the newline
-	** regardless of how many read() calls that takes.
-	*/
+/*
+	Line much longer than any typical BUFFER_SIZE (2048 'A' + newline).
+	A correct implementation must keep reading until it finds the newline
+	regardless of how many read() calls that takes.
+*/
 	{
 		const size_t	len = 2048;
 		char			*big;

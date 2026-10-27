@@ -4,11 +4,11 @@
 #include <string.h>
 
 /*
-** Memory suite: for every libft function that allocates, check that a
-** successful call leaves nothing behind once the result is freed.
-** malloc failure is not injected here: the moulinette doesn't test it, and
-** an unprotected malloc would crash instead of failing a check.
-** Needs the malloc wrapper from src/memcheck.c (Linux only).
+	Memory suite: for every libft function that allocates, check that a
+	successful call leaves nothing behind once the result is freed.
+	malloc failure is not injected here: the moulinette doesn't test it, and
+	an unprotected malloc would crash instead of failing a check.
+	Needs the malloc wrapper from src/memcheck.c (Linux only).
 */
 
 typedef struct s_memcase

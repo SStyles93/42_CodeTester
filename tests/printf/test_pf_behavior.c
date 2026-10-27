@@ -1,14 +1,14 @@
 #include "pf_tester.h"
 
 /*
-** Behaviour that is not about formatting:
-**   - output goes straight to fd 1, in order with raw write() calls
-**     (no buffering inside ft_printf);
-**   - return value is -1 when write() fails, and a failure does not leak
-**     into the next call (return values on success are checked by every
-**     PF() case);
-**   - no state carried over between calls;
-**   - no leaks (and correct behaviour if malloc fails), Linux only.
+	Behaviour that is not about formatting:
+		- output goes straight to fd 1, in order with raw write() calls
+		  (no buffering inside ft_printf);
+		- return value is -1 when write() fails, and a failure does not leak
+		  into the next call (return values on success are checked by every
+		  PF() case);
+		- no state carried over between calls;
+		- no leaks (and correct behaviour if malloc fails), Linux only.
 */
 
 /* Run ft_printf with fd 1 replaced by fd (or closed when fd < 0). */

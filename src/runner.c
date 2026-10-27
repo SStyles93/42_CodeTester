@@ -34,11 +34,11 @@ static void	report_child_status(t_ctx *ctx, const char *label, int status)
 }
 
 /*
-** Run fn(ctx, arg) in a child process so a crash or infinite loop only takes
-** down that piece of work (a whole suite, or one case inside a suite). The
-** counters live in shared memory so the results recorded before a crash are
-** kept. The child calls exit() (not _exit) so LeakSanitizer / valgrind check
-** for leaks at the end of it.
+	Run fn(ctx, arg) in a child process so a crash or infinite loop only takes
+	down that piece of work (a whole suite, or one case inside a suite). The
+	counters live in shared memory so the results recorded before a crash are
+	kept. The child calls exit() (not _exit) so LeakSanitizer / valgrind check
+	for leaks at the end of it.
 */
 void	run_isolated(t_ctx *ctx, const char *label,
 	void (*fn)(t_ctx *, const void *), const void *arg)
@@ -92,8 +92,8 @@ static void	call_suite(t_ctx *ctx, const void *arg)
 }
 
 /*
-** In an informational project a failed check only means "differs from the
-** reference": it is shown in yellow and reported as such, never as a fail.
+	In an informational project a failed check only means "differs from the
+	reference": it is shown in yellow and reported as such, never as a fail.
 */
 static void	run_one(t_suite *suite, t_ctx *ctx, int informational)
 {

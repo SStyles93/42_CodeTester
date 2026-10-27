@@ -27,8 +27,8 @@ static void	run_all_projects(t_project **projects, int count, int verbose)
 }
 
 /*
-** Project names are case-insensitive. "printf" also matches every category
-** of that project ("Printf_mandatory", "Printf_bonus").
+	Project names are case-insensitive. "printf" also matches every category
+	of that project ("Printf_mandatory", "Printf_bonus").
 */
 static int	project_matches(const char *project, const char *name)
 {
@@ -41,9 +41,9 @@ static int	project_matches(const char *project, const char *name)
 }
 
 /*
-** argv argument other than "all": a project name (e.g. "libft", "printf",
-** "printf_bonus") runs that whole project, otherwise it is looked up as a
-** suite name in every project.
+	argv argument other than "all": a project name (e.g. "libft", "printf",
+	"printf_bonus") runs that whole project, otherwise it is looked up as a
+	suite name in every project.
 */
 static int	run_by_name(t_project **projects, int count, const char *name,
 	int verbose)

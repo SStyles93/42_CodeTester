@@ -69,11 +69,11 @@ static const char	*fmt_output(char *buf, size_t size, const char *s, int len,
 }
 
 /*
-** Compares ft_printf's output and return value to snprintf's.
-** alt_exp (may be NULL) is a second accepted output, for combos where two
-** platforms produce different but equally correct text (e.g. "%p" with
-** NULL: "(nil)" vs "0x0"). The host snprintf result is always the primary
-** expected; a "[platform alt]" tag is shown when alt_exp matched.
+	Compares ft_printf's output and return value to snprintf's.
+	alt_exp (may be NULL) is a second accepted output, for combos where two
+	platforms produce different but equally correct text (e.g. "%p" with
+	NULL: "(nil)" vs "0x0"). The host snprintf result is always the primary
+	expected; a "[platform alt]" tag is shown when alt_exp matched.
 */
 void	pf_report_alt(t_ctx *ctx, const char *label,
 		const t_pfcase *c, const char *alt_exp)

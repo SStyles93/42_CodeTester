@@ -6,13 +6,13 @@
 #endif
 
 /*
-** Subject requirements that are not about ft_printf's output:
-**   - libftprintf.a at the root, built with ar (libtool forbidden);
-**   - a header (.h at the root or one directory below) containing the
-**     prototype;
-**   - Makefile with NAME, all, clean, fclean, re (+ bonus), no relink;
-**   - only malloc, free, write (and va_*) as external functions.
-** PRINTF_PATH (absolute path of the project) is set by the Makefile.
+	Subject requirements that are not about ft_printf's output:
+		- libftprintf.a at the root, built with ar (libtool forbidden);
+		- a header (.h at the root or one directory below) containing the
+		  prototype;
+		- Makefile with NAME, all, clean, fclean, re (+ bonus), no relink;
+		- only malloc, free, write (and va_*) as external functions.
+	PRINTF_PATH (absolute path of the project) is set by the Makefile.
 */
 
 #ifndef PRINTF_PATH

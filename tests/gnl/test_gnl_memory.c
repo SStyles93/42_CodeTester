@@ -1,11 +1,11 @@
 #include "gnl_tester.h"
 
 /*
-** "All heap-allocated memory must be properly freed": once get_next_line()
-** has returned NULL at EOF and every line was freed, nothing may remain
-** (the static variable included). When the Nth malloc fails, the call must
-** return NULL without crashing, and reading on until EOF must not leak.
-** Needs the malloc wrapper from src/memcheck.c (Linux only).
+	"All heap-allocated memory must be properly freed": once get_next_line()
+	has returned NULL at EOF and every line was freed, nothing may remain
+	(the static variable included). When the Nth malloc fails, the call must
+	return NULL without crashing, and reading on until EOF must not leak.
+	Needs the malloc wrapper from src/memcheck.c (Linux only).
 */
 
 #define GNL_MEM_CONTENT "first line\nsecond line\n\nlast line, no newline"

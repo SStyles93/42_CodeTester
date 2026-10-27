@@ -1,8 +1,8 @@
 #include "gnl_tester.h"
 
 /*
-** Basic single-call behaviour: invalid fd, empty input, single line with and
-** without a terminating newline, and a bare newline.
+	Basic single-call behaviour: invalid fd, empty input, single line with and
+	without a terminating newline, and a bare newline.
 */
 void	test_get_next_line(t_ctx *ctx)
 {

@@ -6,14 +6,14 @@
 # include <limits.h>
 
 /*
-** Every case is checked against the host libc: the expected output and
-** return value come from snprintf() called with the same arguments, so the
-** reference is whatever the real printf prints on this machine (glibc on
-** Linux, libSystem on macOS).
-**
-** Some cases deliberately use flag/specifier combinations the C standard
-** leaves undefined (Printf_original suites), so silence the compiler's
-** format checks for the test files.
+	Every case is checked against the host libc: the expected output and
+	return value come from snprintf() called with the same arguments, so the
+	reference is whatever the real printf prints on this machine (glibc on
+	Linux, libSystem on macOS).
+
+	Some cases deliberately use flag/specifier combinations the C standard
+	leaves undefined (Printf_original suites), so silence the compiler's
+	format checks for the test files.
 */
 # pragma GCC diagnostic ignored "-Wformat"
 # pragma GCC diagnostic ignored "-Wformat-extra-args"
@@ -52,15 +52,15 @@ void	pf_report_alt(t_ctx *ctx, const char *label, const t_pfcase *c,
 			const char *alt_exp);
 
 /*
-** PF_L(ctx, label, format, args...): run snprintf and ft_printf with the same
-** arguments and compare the bytes written and the return value.
-** PF(ctx, format, args...): same, the label is the call's source text.
-**
-** PF_L_ALT(ctx, label, alt_exp, format, args...): like PF_L but also accepts
-** alt_exp as a valid output.  Use for cases where two platforms produce
-** different but equally correct strings (e.g. "%p" with NULL: Linux gives
-** "(nil)", macOS gives "0x0").  Whichever snprintf produces is the primary
-** expected; alt_exp covers the other platform.
+	PF_L(ctx, label, format, args...): run snprintf and ft_printf with the same
+	arguments and compare the bytes written and the return value.
+	PF(ctx, format, args...): same, the label is the call's source text.
+
+	PF_L_ALT(ctx, label, alt_exp, format, args...): like PF_L but also accepts
+	alt_exp as a valid output.  Use for cases where two platforms produce
+	different but equally correct strings (e.g. "%p" with NULL: Linux gives
+	"(nil)", macOS gives "0x0").  Whichever snprintf produces is the primary
+	expected; alt_exp covers the other platform.
 */
 # define PF_L(ctx, label, ...) do { \
 	t_pfcase	pf_c_; \

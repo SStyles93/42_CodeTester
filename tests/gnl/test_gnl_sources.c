@@ -4,9 +4,9 @@
 #endif
 
 /*
-** "Make sure that your function works as expected both when reading a file
-** and when reading from the standard input." / "A file descriptor does not
-** only point to regular files." Plus the error cases that must return NULL.
+	"Make sure that your function works as expected both when reading a file
+	and when reading from the standard input." / "A file descriptor does not
+	only point to regular files." Plus the error cases that must return NULL.
 */
 
 static void	check_regular_file(t_ctx *ctx)

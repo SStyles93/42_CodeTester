@@ -5,15 +5,15 @@
 #endif
 
 /*
-** Subject requirements that are not about get_next_line()'s output:
-**   - the 3 files at the root, the header containing the prototype;
-**   - compiles with cc -Wall -Wextra -Werror, with and without -D BUFFER_SIZE
-**     (and with the values the subject asks about: 1, 9999, 10000000);
-**   - only read, malloc and free as external functions (no lseek, no libft);
-**   - no global variable; bonus: only one static variable;
-**   - README.md: italic first line, Description / Instructions / Resources
-**     sections.
-** GNL_PATH (absolute path of the project) is set by the Makefile.
+	Subject requirements that are not about get_next_line()'s output:
+		- the 3 files at the root, the header containing the prototype;
+		- compiles with cc -Wall -Wextra -Werror, with and without -D BUFFER_SIZE
+			(and with the values the subject asks about: 1, 9999, 10000000);
+		- only read, malloc and free as external functions (no lseek, no libft);
+		- no global variable; bonus: only one static variable;
+		- README.md: italic first line, Description / Instructions / Resources
+			sections.
+	GNL_PATH (absolute path of the project) is set by the Makefile.
 */
 
 #define GNL_OUT_SIZE 65536
@@ -213,9 +213,9 @@ static void	first_error(const char *out, char *line, size_t size)
 }
 
 /*
-** "We must be able to compile this project with and without the -D
-** BUFFER_SIZE flag in addition to the usual flags." The objects of the
-** BUFFER_SIZE=42 build are left in dir for the symbol checks.
+	"We must be able to compile this project with and without the -D
+	BUFFER_SIZE flag in addition to the usual flags." The objects of the
+	BUFFER_SIZE=42 build are left in dir for the symbol checks.
 */
 static int	check_compile(t_ctx *ctx, const t_gnlfiles *files, const char *dir)
 {
@@ -295,9 +295,9 @@ static int	is_internal(const char *name)
 }
 
 /*
-** nm output: "addr type name" (defined) or "type name" (undefined).
-** U: external function; B D C G S R: global variable;
-** b d s r: static variable (local or file-scope).
+	nm output: "addr type name" (defined) or "type name" (undefined).
+	U: external function; B D C G S R: global variable;
+	b d s r: static variable (local or file-scope).
 */
 static void	check_symbols(t_ctx *ctx, const char *dir, int max_statics)
 {

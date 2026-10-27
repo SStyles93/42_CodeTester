@@ -2,14 +2,17 @@
 #include "../../include/weak_functions.h"
 
 /*
-** Three categories:
-**   Printf_mandatory: conversions cspdiuxX% without any flag, and the
-**                     project requirements (Makefile, header, README...);
-**   Printf_bonus:     '-0.' + minimum width, '# +', and their combinations.
-**                     Only assessed if the mandatory part is perfect;
-**   Printf_original:  behaviour of the original printf the subject does not
-**                     require (invalid / incomplete conversions, flags that
-**                     do not apply). Informational: never counted as fails.
+Three categories:
+	Printf_mandatory:
+				conversions cspdiuxX% without any flag, and the
+				project requirements (Makefile, header, README...);
+	Printf_bonus:
+				'-0.' + minimum width, '# +', and their combinations.
+				Only assessed if the mandatory part is perfect;
+	Printf_original:
+				behaviour of the original printf the subject does not
+				require (invalid / incomplete conversions, flags that
+				do not apply). Informational: never counted as fails.
 */
 
 void	test_ft_printf(t_ctx *ctx);

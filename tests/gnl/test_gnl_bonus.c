@@ -1,9 +1,9 @@
 #include "gnl_tester.h"
 
 /*
-** Two file descriptors read in alternating order.
-** Each call must return the next line of the fd that was passed, not the last
-** fd read from.
+	Two file descriptors read in alternating order.
+	Each call must return the next line of the fd that was passed, not the last
+	fd read from.
 */
 void	test_gnl_two_fd(t_ctx *ctx)
 {
@@ -51,8 +51,8 @@ void	test_gnl_two_fd(t_ctx *ctx)
 }
 
 /*
-** Three file descriptors cycled in rotation.  Exhausting fd3 early must not
-** corrupt the state of fd1 or fd2.
+	Three file descriptors cycled in rotation.  Exhausting fd3 early must not
+	corrupt the state of fd1 or fd2.
 */
 void	test_gnl_three_fd(t_ctx *ctx)
 {

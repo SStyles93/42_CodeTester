@@ -1,8 +1,8 @@
 #include "gnl_tester.h"
 
 /*
-** Multi-call behaviour: repeated calls must return one line per call and
-** eventually return NULL when the source is exhausted.
+	Multi-call behaviour: repeated calls must return one line per call and
+	eventually return NULL when the source is exhausted.
 */
 void	test_gnl_lines(t_ctx *ctx)
 {

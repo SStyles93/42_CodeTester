@@ -1,16 +1,16 @@
 #include "pf_tester.h"
 
 /*
-** Combinations the C standard leaves undefined (incomplete or unknown
-** conversions, flags that do not apply to the specifier, NULL format...).
-** The subject does not require any particular output for them, so these
-** suites belong to the informational Printf_original category: they report
-** how close you are to the host libc and never count as failures.
-**
-** original_conversions only uses the mandatory syntax (no flags/width);
-** original_flags covers the flag cases. Cases that could crash run in
-** their own process. "%s" with a NULL pointer is undefined in C (glibc
-** prints "(null)", or "" when the precision is below 6).
+	Combinations the C standard leaves undefined (incomplete or unknown
+	conversions, flags that do not apply to the specifier, NULL format...).
+	The subject does not require any particular output for them, so these
+	suites belong to the informational Printf_original category: they report
+	how close you are to the host libc and never count as failures.
+
+	original_conversions only uses the mandatory syntax (no flags/width);
+	original_flags covers the flag cases. Cases that could crash run in
+	their own process. "%s" with a NULL pointer is undefined in C (glibc
+	prints "(null)", or "" when the precision is below 6).
 */
 
 static void	isolated_no_arg(t_ctx *ctx, const void *arg)

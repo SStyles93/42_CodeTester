@@ -1,10 +1,10 @@
 #include "tester.h"
 
 /*
-** Every result is printed on one line:
-**   ✓ <name> → <value>
-**   ✗ <name> → expected: <value> → got: <value>
-** Strings are quoted and escaped (\n, \t, \xNN), and cut after SHOW_MAX bytes.
+	Every result is printed on one line:
+		✓ <name> → <value>
+		✗ <name> → expected: <value> → got: <value>
+	Strings are quoted and escaped (\n, \t, \xNN), and cut after SHOW_MAX bytes.
 */
 
 #define SHOW_MAX 120

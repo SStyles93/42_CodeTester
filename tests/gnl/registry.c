@@ -1,15 +1,18 @@
 #include "gnl_tester.h"
 
 /*
-** Two categories:
-**   GNL_mandatory: get_next_line.c / get_next_line_utils.c, and the project
-**                  requirements (files, compilation, functions, README...);
-**   GNL_bonus:     get_next_line_bonus.c / get_next_line_utils_bonus.c: the
-**                  same suites again (the bonus must still be a correct
-**                  get_next_line), several fds at once and one static.
-**                  Only assessed if the mandatory part is perfect.
-** The bonus get_next_line is compiled as get_next_line_bonus (see Makefile),
-** so both implementations are linked and tested independently.
+Two categories:
+	GNL_mandatory:
+				get_next_line.c / get_next_line_utils.c, and the project
+				requirements (files, compilation, functions, README...);
+	GNL_bonus:
+				get_next_line_bonus.c / get_next_line_utils_bonus.c: the
+				same suites again (the bonus must still be a correct
+				get_next_line), several fds at once and one static.
+				Only assessed if the mandatory part is perfect.
+
+The bonus get_next_line is compiled as get_next_line_bonus (see Makefile),
+so both implementations are linked and tested independently.
 */
 
 void	test_get_next_line(t_ctx *ctx);

@@ -20,8 +20,8 @@ int	gnl_open_pipe(const char *content)
 }
 
 /*
-** tmpfile() is removed when closed; dup() keeps the file alive and shares
-** its offset, so rewinding the FILE also rewinds the returned fd.
+	tmpfile() is removed when closed; dup() keeps the file alive and shares
+	its offset, so rewinding the FILE also rewinds the returned fd.
 */
 int	gnl_open_file(const char *content)
 {

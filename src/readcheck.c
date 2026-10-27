@@ -2,10 +2,10 @@
 #include <sys/types.h>
 
 /*
-** read() wrapper that verifies every call from get_next_line() uses
-** count == BUFFER_SIZE (Linux only, -Wl,--wrap=read).
-** Only reads on the watched fd are checked; internal libc reads on
-** other fds are ignored.
+	read() wrapper that verifies every call from get_next_line() uses
+	count == BUFFER_SIZE (Linux only, -Wl,--wrap=read).
+	Only reads on the watched fd are checked; internal libc reads on
+	other fds are ignored.
 */
 
 #ifdef READCHECK_WRAP

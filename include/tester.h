@@ -46,9 +46,9 @@ typedef struct s_project
 # define SHOW_BUF 640
 
 /*
-** Assertion helpers (src/utils.c). Every result is one line:
-**   ✓ <name> → <value>
-**   ✗ <name> → expected: <value> → got: <value>
+	Assertion helpers (src/utils.c). Every result is one line:
+		✓ <name> → <value>
+		✗ <name> → expected: <value> → got: <value>
 */
 const char	*fmt_bytes(char *buf, size_t size, const char *s, size_t len);
 const char	*fmt_str(char *buf, size_t size, const char *s);

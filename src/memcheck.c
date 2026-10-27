@@ -1,18 +1,18 @@
 #include "tester.h"
 
 /*
-** Allocation tracker used by the "memory" suite.
-**
-** On Linux the tester is linked with -Wl,--wrap=malloc,--wrap=calloc,
-** --wrap=free, so every call to those functions from the tester AND from
-** libft.a is routed through the __wrap_* functions below. While tracking is
-** on (mem_begin .. mem_end) we:
-**   - record every live block, so mem_end() can report what was never freed;
-**   - optionally make the Nth allocation return NULL, to check that libft
-**     functions handle malloc failure (return NULL, free partial results).
-**
-** On other platforms (no GNU ld --wrap) the stubs at the bottom are used and
-** mem_available() returns 0, so the memory suite is skipped.
+	Allocation tracker used by the "memory" suite.
+
+	On Linux the tester is linked with -Wl,--wrap=malloc,--wrap=calloc,
+	--wrap=free, so every call to those functions from the tester AND from
+	libft.a is routed through the __wrap_* functions below. While tracking is
+	on (mem_begin .. mem_end) we:
+		- record every live block, so mem_end() can report what was never freed;
+		- optionally make the Nth allocation return NULL, to check that libft
+		  functions handle malloc failure (return NULL, free partial results).
+
+	On other platforms (no GNU ld --wrap) the stubs at the bottom are used and
+	mem_available() returns 0, so the memory suite is skipped.
 */
 
 #ifdef MEMCHECK_WRAP

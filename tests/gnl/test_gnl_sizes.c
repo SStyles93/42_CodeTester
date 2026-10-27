@@ -4,9 +4,9 @@
 #endif
 
 /*
-** Line lengths around BUFFER_SIZE ("both the buffer size and the line size
-** can be of very different values"). Rebuild with another value to test it:
-** make re BUFFER_SIZE=1 (or `make gnl-sizes` for 1, 42, 9999, 10000000).
+	Line lengths around BUFFER_SIZE ("both the buffer size and the line size
+	can be of very different values"). Rebuild with another value to test it:
+	make re BUFFER_SIZE=1 (or `make gnl-sizes` for 1, 42, 9999, 10000000).
 */
 
 /* check_str, but long lines are shown as their length, not their bytes. */
@@ -119,8 +119,8 @@ void	test_gnl_sizes(t_ctx *ctx)
 }
 
 /*
-** A file of 1000 numbered lines (bigger than a pipe can hold): every line in
-** order, then NULL.
+	A file of 1000 numbered lines (bigger than a pipe can hold): every line in
+	order, then NULL.
 */
 void	test_gnl_big_file(t_ctx *ctx)
 {
@@ -169,9 +169,9 @@ void	test_gnl_big_file(t_ctx *ctx)
 }
 
 /*
-** The subject mandates that get_next_line() calls read() with count ==
-** BUFFER_SIZE every time. We wrap read() (Linux, --wrap=read) and flag any
-** call on the same fd where the count differs.
+	The subject mandates that get_next_line() calls read() with count ==
+	BUFFER_SIZE every time. We wrap read() (Linux, --wrap=read) and flag any
+	call on the same fd where the count differs.
 */
 void	test_gnl_read_count(t_ctx *ctx)
 {
@@ -201,10 +201,10 @@ void	test_gnl_read_count(t_ctx *ctx)
 }
 
 /*
-** "Try to read as little as possible each time get_next_line() is called...
-** Don't read the whole file and then process each line."
-** After the first call, the file offset must not be past the read() that
-** found the first "\n".
+	"Try to read as little as possible each time get_next_line() is called...
+	Don't read the whole file and then process each line."
+	After the first call, the file offset must not be past the read() that
+	found the first "\n".
 */
 void	test_gnl_read_little(t_ctx *ctx)
 {

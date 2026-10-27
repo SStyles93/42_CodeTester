@@ -1,9 +1,9 @@
 #include "pf_tester.h"
 
 /*
-** Flags, width and precision must not leak into the next conversion/call.
-** Each flag on its own is covered by bonus_minus_zero_dot and
-** bonus_hash_space_plus.
+	Flags, width and precision must not leak into the next conversion/call.
+	Each flag on its own is covered by bonus_minus_zero_dot and
+	bonus_hash_space_plus.
 */
 
 void	test_pf_combinations(t_ctx *ctx)
