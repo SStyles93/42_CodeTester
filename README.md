@@ -20,6 +20,7 @@ An interactive C tester for 42 projects.
 - **Crash isolation** — each suite runs in a forked child process; a segfault or infinite loop only kills that suite, not the whole run
 - **Timeout detection** — tests that hang are killed after a configurable deadline (default 10 s)
 - **Malloc-failure testing** — `memcheck` wraps `malloc`/`calloc`/`free` to inject allocation failures and verify your code handles them gracefully ${\color{orange}\text{(Linux only)}}$
+- **read() count check** — `readcheck` wraps `read()` to verify get_next_line always calls it with `count == BUFFER_SIZE` ${\color{orange}\text{(Linux only)}}$
 - **AddressSanitizer + UBSan** — `make asan` recompiles the tester, libft and get_next_line with sanitizers and runs the full suite ${\color{orange}\text{(Linux and macOS)}}$
 - **Valgrind** — `make valgrind` runs under Valgrind with full leak checking ${\color{orange}\text{(Linux only)}}$
 - **Cross-platform** — builds on Linux, macOS, and Windows (native or WSL/MinGW)
@@ -197,6 +198,7 @@ The mandatory files and the bonus files are compiled separately (the bonus `get_
 | `gnl_edge_cases` | leading `\n`, single-character lines, lines much longer than `BUFFER_SIZE` |
 | `gnl_buffer_size` | line lengths around `BUFFER_SIZE` (rebuild with `make re BUFFER_SIZE=n` or use `make gnl-sizes`) |
 | `gnl_big_file` | a 1000-line file, bigger than a pipe can hold |
+| `gnl_read_count` | every `read()` on the fd is called with `count == BUFFER_SIZE`: reading any other size (e.g. `BUFFER_SIZE - len` to fill the remaining space, or a hardcoded value) fails. `read()` is wrapped with `--wrap=read`, so the suite is skipped outside Linux ${\color{orange}\text{(Linux)}}$ |
 | `gnl_read_little` | does not read the whole file at once: after the first call, the offset is not past the `read()` that found the first `\n` |
 | `gnl_sources` | regular files, standard input, `NULL` after EOF, and the error cases that must return `NULL`: fd `-1`, an fd never opened, a closed pipe, a directory fd (`read()` fails). An fd closed mid-file is not tested: when the next line is already buffered, a correct `get_next_line` returns it without calling `read()`, so it cannot see the error |
 | `gnl_memory` | no leak once `NULL` is returned (static included), malloc-failure handling ${\color{orange}\text{(Linux)}}$ |
@@ -222,7 +224,8 @@ CodeTester/
 │   ├── menu.c          # Interactive TUI
 │   ├── runner.c        # Fork/isolation, suite runner, timeout
 │   ├── utils.c         # check_* assertion helpers
-│   └── memcheck.c      # malloc/calloc/free wrapper for failure injection
+│   ├── memcheck.c      # malloc/calloc/free wrapper for failure injection
+│   └── readcheck.c     # read() wrapper: checks count == BUFFER_SIZE (gnl)
 ├── include/
 │   ├── tester.h        # Shared types and declarations
 │   └── weak_functions.h  # Weak declarations for all project functions
@@ -245,7 +248,7 @@ CodeTester/
 │       ├── registry.c  # Registers GNL_mandatory / GNL_bonus (each suite wrapped for both)
 │       ├── gnl_tester.h, gnl_utils.c  # pipe / temp-file helpers, g_gnl pointer
 │       ├── test_gnl.c, test_gnl_lines.c, test_gnl_edge.c  # line reading
-│       ├── test_gnl_sizes.c     # BUFFER_SIZE, big file, read as little as possible
+│       ├── test_gnl_sizes.c     # BUFFER_SIZE, big file, read() count, read as little as possible
 │       ├── test_gnl_sources.c   # files, stdin, error cases
 │       ├── test_gnl_memory.c    # leaks, malloc failures
 │       ├── test_gnl_project.c   # subject requirements (files, build, nm, README...)
