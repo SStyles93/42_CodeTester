@@ -11,7 +11,7 @@ An interactive C tester for 42 projects.
 |---|---|---|
 | **Libft** | Full ${\color{lightgreen}\text{(including linked-list functions)}}$ | ${\color{lightgreen}\text{100/100}}$ |  
 | **Printf** | Full ${\color{lightgreen}\text{(mandatory + bonus + original printf behaviour)}}$ | ${\color{lightgreen}\text{125/100}}$ |  
-| **Get_next_line** | Full ${\color{lightgreen}\text{(mandatory + bonus)}}$ | ${\color{orange}\text{TBD}}$ |  
+| **Get_next_line** | Full ${\color{lightgreen}\text{(mandatory + bonus)}}$ | ${\color{lightgreen}\text{125/100}}$ |  
 
 
 ## Features
